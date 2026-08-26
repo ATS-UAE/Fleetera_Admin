@@ -1,0 +1,291 @@
+/* ── Shared Link Public View ───────────────────────────────────────────────── */
+
+.container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  background: var(--fv-bg-base);
+}
+
+/* Floating left panel */
+.sidebar {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 320px;
+  max-height: calc(100vh - 20px);
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: max-height 0.3s ease;
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.linkName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #333;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.iconBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Vehicle list */
+.vehicleList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.vehicleCard {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: #ffffff;
+  transition: background 0.15s;
+}
+
+.vehicleCard:hover {
+  background: #f9fafb;
+}
+
+.vehicleCardActive {
+  background: #f3f4f6;
+}
+
+.vehicleCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.vehicleCardIcon {
+  width: 26px;
+  height: 26px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vehicleCardName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.vehicleCardAddress {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  padding-left: 38px;
+}
+
+.vehicleCardMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 38px;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.parkedBadge {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.parkedBadge::before {
+  content: 'P';
+  background: rgba(255, 255, 255, 0.2);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.statusLetter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.lastSeen {
+  font-size: 11px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lastSeen svg {
+  color: #9ca3af;
+}
+
+/* Map container */
+.mapWrap {
+  flex: 1;
+  position: relative;
+}
+
+.mapFull {
+  width: 100%;
+  height: 100%;
+}
+
+/* Expired overlay */
+.expiredOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 14, 26, 0.9);
+  z-index: 2000;
+  gap: 12px;
+}
+
+.expiredIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fv-rose);
+  margin-bottom: 8px;
+}
+
+.expiredTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.expiredDesc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  max-width: 360px;
+}
+
+/* Driver info */
+.driverInfo {
+  padding-left: 38px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.driverLine {
+  font-size: 11px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.driverLine svg {
+  flex-shrink: 0;
+}
+
+/* Toggle sidebar on mobile */
+.toggleSidebarBtn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1001;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #333;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    top: 56px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: 50vh;
+  }
+  .sidebarHidden {
+    display: none;
+  }
+  .toggleSidebarBtn {
+    display: flex;
+  }
+}
+

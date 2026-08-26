@@ -1,0 +1,919 @@
+/* ── Maintenance — Main Page ───────────────────────────────────────────────── */
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fv-bg-base);
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  padding: 24px 32px 0;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--fv-text-primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.titleIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--fv-accent), var(--fv-cyan));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--fv-border);
+}
+
+.tab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fv-text-secondary);
+  cursor: pointer;
+  position: relative;
+  transition: color var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+}
+
+.tab:hover {
+  color: var(--fv-text-primary);
+}
+
+.tabActive {
+  color: var(--fv-accent);
+}
+
+.tabActive::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--fv-accent);
+  border-radius: 2px 2px 0 0;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  flex-shrink: 0;
+}
+
+.newServiceBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #e53935, #d32f2f);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.3);
+  font-family: var(--fv-font-sans);
+}
+
+.newServiceBtn:hover {
+  background: linear-gradient(135deg, #f44336, #e53935);
+  box-shadow: 0 4px 12px rgba(229, 57, 53, 0.45);
+  transform: translateY(-1px);
+}
+
+.filterBtnGroup {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--fv-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.filterBtn {
+  padding: 7px 16px;
+  background: var(--fv-bg-panel);
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fv-text-secondary);
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+}
+
+.filterBtn:not(:last-child) {
+  border-right: 1px solid var(--fv-border);
+}
+
+.filterBtn:hover {
+  background: var(--fv-bg-hover);
+  color: var(--fv-text-primary);
+}
+
+.filterBtnActive {
+  background: var(--fv-accent);
+  color: #fff;
+}
+
+.filterBtnActive:hover {
+  background: var(--fv-accent);
+  color: #fff;
+}
+
+.searchBox {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--fv-bg-panel);
+  border: 1px solid var(--fv-border);
+  border-radius: 6px;
+  padding: 0 12px;
+  height: 36px;
+  max-width: 400px;
+}
+
+.searchBox svg {
+  color: var(--fv-text-muted);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--fv-text-primary);
+  font-size: 13px;
+  font-family: var(--fv-font-sans);
+}
+
+.searchInput::placeholder {
+  color: var(--fv-text-muted);
+}
+
+/* Content area: side-by-side when new-service form is open */
+.contentArea {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── New Service Slide-over Panel ─────────────────────────────────────────── */
+.newServicePanel {
+  width: 320px;
+  min-width: 320px;
+  background: var(--fv-bg-panel);
+  border-right: 1px solid var(--fv-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 20px;
+  animation: slideIn 0.25s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.panelTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fv-text-primary);
+}
+
+.panelClose {
+  background: none;
+  border: none;
+  color: var(--fv-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: all var(--fv-trans-fast);
+}
+
+.panelClose:hover {
+  background: var(--fv-bg-hover);
+  color: var(--fv-text-primary);
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.formLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fv-text-secondary);
+  margin-bottom: 6px;
+}
+
+.nameInputRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nameIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--fv-accent), #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.formInput {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--fv-bg-base);
+  border: 1px solid var(--fv-border);
+  border-radius: 6px;
+  color: var(--fv-text-primary);
+  font-size: 13px;
+  font-family: var(--fv-font-sans);
+  transition: border-color var(--fv-trans-fast), box-shadow var(--fv-trans-fast);
+  outline: none;
+}
+
+.formInput:focus {
+  border-color: var(--fv-accent);
+  box-shadow: 0 0 0 3px var(--fv-accent-glow);
+}
+
+.formInput::placeholder {
+  color: var(--fv-text-muted);
+}
+
+.formSelect {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--fv-bg-base);
+  border: 1px solid var(--fv-border);
+  border-radius: 6px;
+  color: var(--fv-text-primary);
+  font-size: 13px;
+  font-family: var(--fv-font-sans);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  transition: border-color var(--fv-trans-fast);
+}
+
+.formSelect:focus {
+  border-color: var(--fv-accent);
+  box-shadow: 0 0 0 3px var(--fv-accent-glow);
+}
+
+/* Priority & Status dropdowns row */
+.dropdownRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.priorityBadge,
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid var(--fv-border);
+  background: var(--fv-bg-card);
+  color: var(--fv-text-primary);
+  transition: all var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+  user-select: none;
+}
+
+.priorityBadge:hover,
+.statusBadge:hover {
+  border-color: var(--fv-accent);
+}
+
+/* Dropdown popup */
+.dropdownPopup {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--fv-bg-panel);
+  border: 1px solid var(--fv-border-light);
+  border-radius: 8px;
+  box-shadow: var(--fv-shadow-lg);
+  padding: 6px 0;
+  z-index: 100;
+  min-width: 150px;
+  animation: fv-fadeIn 0.15s ease;
+}
+
+.dropdownOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--fv-text-primary);
+  transition: background var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+}
+
+.dropdownOption:hover {
+  background: var(--fv-bg-hover);
+}
+
+.dropdownCheck {
+  width: 16px;
+  color: var(--fv-accent);
+}
+
+.formTextarea {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--fv-bg-base);
+  border: 1px solid var(--fv-border);
+  border-radius: 6px;
+  color: var(--fv-text-primary);
+  font-size: 13px;
+  font-family: var(--fv-font-sans);
+  min-height: 80px;
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--fv-trans-fast);
+}
+
+.formTextarea:focus {
+  border-color: var(--fv-accent);
+  box-shadow: 0 0 0 3px var(--fv-accent-glow);
+}
+
+.formTextarea::placeholder {
+  color: var(--fv-text-muted);
+}
+
+.uploadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: none;
+  border: 1px solid var(--fv-accent);
+  border-radius: 6px;
+  color: var(--fv-accent);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+}
+
+.uploadBtn:hover {
+  background: var(--fv-accent-subtle);
+}
+
+.formFooter {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.saveBtn {
+  padding: 8px 22px;
+  background: linear-gradient(135deg, var(--fv-accent), #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+}
+
+.saveBtn:hover {
+  box-shadow: 0 4px 12px var(--fv-accent-glow);
+  transform: translateY(-1px);
+}
+
+.cancelBtn {
+  padding: 8px 22px;
+  background: none;
+  border: none;
+  color: var(--fv-accent);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--fv-font-sans);
+  transition: color var(--fv-trans-fast);
+}
+
+.cancelBtn:hover {
+  color: var(--fv-text-primary);
+}
+
+/* ── Table Area ──────────────────────────────────────────────────────────── */
+.tableArea {
+  flex: 1;
+  overflow: auto;
+}
+
+.tableWrap {
+  width: 100%;
+  padding: 0 32px 24px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fv-text-secondary);
+  background: var(--fv-bg-surface);
+  border-bottom: 1px solid var(--fv-border);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.table th:hover {
+  color: var(--fv-text-primary);
+}
+
+.table td {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--fv-text-primary);
+  border-bottom: 1px solid var(--fv-border);
+  vertical-align: middle;
+}
+
+.table tr:hover td {
+  background: var(--fv-bg-hover);
+}
+
+.table tr {
+  cursor: pointer;
+  transition: background var(--fv-trans-fast);
+}
+
+/* Settings gear icon */
+.settingsBtn {
+  background: none;
+  border: none;
+  color: var(--fv-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: all var(--fv-trans-fast);
+}
+
+.settingsBtn:hover {
+  background: var(--fv-bg-hover);
+  color: var(--fv-text-primary);
+}
+
+/* Service name cell */
+.serviceNameCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.serviceIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--fv-accent), #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.serviceNameText {
+  display: flex;
+  flex-direction: column;
+}
+
+.serviceName {
+  font-weight: 500;
+  color: var(--fv-text-primary);
+}
+
+.serviceOverdue {
+  font-size: 11px;
+  color: var(--fv-rose);
+  font-weight: 500;
+}
+
+/* Vehicle badge */
+.vehicleBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-border-light);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fv-text-primary);
+}
+
+.vehicleIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: rgba(229, 57, 53, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e53935;
+}
+
+/* Priority badge in table */
+.priorityCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-border);
+  color: var(--fv-text-primary);
+}
+
+.priorityDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.priorityDotLow {
+  background: var(--fv-cyan);
+}
+
+.priorityDotNormal {
+  background: var(--fv-text-secondary);
+}
+
+.priorityDotHigh {
+  background: var(--fv-amber);
+}
+
+.priorityDotUrgent {
+  background: var(--fv-rose);
+}
+
+/* Status badge in table */
+.statusCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.statusTodo {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.statusInprogress {
+  background: rgba(139, 92, 246, 0.12);
+  color: #8b5cf6;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.statusDone {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.statusRejected {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* Deadline cell */
+.deadlineCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.deadlineIcon {
+  color: var(--fv-text-muted);
+}
+
+/* Delete button */
+.deleteBtn {
+  background: none;
+  border: none;
+  color: var(--fv-text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: all var(--fv-trans-fast);
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--fv-rose);
+}
+
+/* Empty state */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  gap: 12px;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--fv-bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fv-text-muted);
+  margin-bottom: 8px;
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fv-text-primary);
+}
+
+.emptyDesc {
+  font-size: 13px;
+  color: var(--fv-text-muted);
+}
+
+/* ── Service Detail (breadcrumb page) ─────────────────────────────────────── */
+.detailContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fv-bg-base);
+  overflow-y: auto;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 32px 0;
+  font-size: 12px;
+  color: var(--fv-text-muted);
+}
+
+.breadcrumbLink {
+  background: none;
+  border: none;
+  color: var(--fv-text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--fv-font-sans);
+  transition: color var(--fv-trans-fast);
+  padding: 0;
+}
+
+.breadcrumbLink:hover {
+  color: var(--fv-accent);
+}
+
+.detailHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 32px 0;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: var(--fv-text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: all var(--fv-trans-fast);
+}
+
+.backBtn:hover {
+  background: var(--fv-bg-hover);
+  color: var(--fv-text-primary);
+}
+
+.detailTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--fv-text-primary);
+}
+
+/* Detail tabs */
+.detailTabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--fv-border);
+  margin: 16px 32px 0;
+}
+
+.detailTab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fv-text-secondary);
+  cursor: pointer;
+  position: relative;
+  transition: color var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+}
+
+.detailTab:hover {
+  color: var(--fv-text-primary);
+}
+
+.detailTabActive {
+  color: var(--fv-accent);
+}
+
+.detailTabActive::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--fv-accent);
+  border-radius: 2px 2px 0 0;
+}
+
+/* Vehicle info bar */
+.vehicleInfoBar {
+  margin: 20px 32px 0;
+  padding: 12px 16px;
+  background: var(--fv-bg-surface);
+  border-radius: 8px;
+  border-left: 3px solid var(--fv-accent);
+  font-size: 12px;
+  color: var(--fv-text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vehicleInfoBar span {
+  color: var(--fv-accent);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.vehicleInfoBar span:hover {
+  text-decoration: underline;
+}
+
+.vehicleOverdue {
+  color: var(--fv-rose) !important;
+  font-weight: 600 !important;
+}
+
+/* Detail form */
+.detailForm {
+  padding: 20px 32px 32px;
+  max-width: 480px;
+}
+
+.detailFormGroup {
+  margin-bottom: 20px;
+}
+
+/* Service Plans placeholder */
+.plansContainer {
+  padding: 32px;
+}
+
+.planCard {
+  background: var(--fv-bg-panel);
+  border: 1px solid var(--fv-border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  transition: all var(--fv-trans-fast);
+}
+
+.planCard:hover {
+  border-color: var(--fv-accent);
+  box-shadow: 0 0 0 1px var(--fv-accent-glow);
+}
+
+.planName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fv-text-primary);
+  margin-bottom: 4px;
+}
+
+.planDesc {
+  font-size: 12px;
+  color: var(--fv-text-secondary);
+  margin-bottom: 6px;
+}
+
+.planInterval {
+  font-size: 11px;
+  color: var(--fv-text-muted);
+}

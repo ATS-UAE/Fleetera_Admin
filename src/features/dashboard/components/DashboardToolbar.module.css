@@ -1,0 +1,166 @@
+/* ── View bar (non-edit) ─────────────────────────────────────────────── */
+.viewBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fv-text-secondary);
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-border);
+  border-radius: var(--fv-r-md);
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+}
+
+.editBtn:hover {
+  border-color: var(--fv-accent);
+  color: var(--fv-accent);
+  background: var(--fv-accent-subtle);
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-border);
+  border-radius: var(--fv-r-md);
+  color: var(--fv-text-muted);
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+}
+
+.iconBtn:hover {
+  border-color: var(--fv-accent);
+  color: var(--fv-accent);
+}
+
+/* ── Edit mode toolbar ──────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: fadeIn 200ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.editBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--fv-accent-subtle);
+  border: 1px solid var(--fv-accent);
+  border-radius: var(--fv-r-md);
+  color: var(--fv-accent);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.separator {
+  width: 1px;
+  height: 20px;
+  background: var(--fv-border);
+  margin: 0 4px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.toolBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fv-text-primary);
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-border);
+  border-radius: var(--fv-r-md);
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+}
+
+.toolBtn:hover {
+  border-color: var(--fv-accent);
+  background: var(--fv-accent-subtle);
+}
+
+.toolBtnIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-border);
+  border-radius: var(--fv-r-md);
+  color: var(--fv-text-secondary);
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+}
+
+.toolBtnIcon:hover:not(:disabled) {
+  border-color: var(--fv-accent);
+  color: var(--fv-accent);
+}
+
+.toolBtnIcon:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.toolBtnSecondary {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fv-text-secondary);
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-border);
+  border-radius: var(--fv-r-md);
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+}
+
+.toolBtnSecondary:hover {
+  background: var(--fv-bg-hover);
+}
+
+.toolBtnPrimary {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  background: var(--fv-accent);
+  border: 1px solid var(--fv-accent);
+  border-radius: var(--fv-r-md);
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+}
+
+.toolBtnPrimary:hover {
+  background: var(--fv-accent-dim);
+  box-shadow: 0 0 12px var(--fv-accent-glow);
+}

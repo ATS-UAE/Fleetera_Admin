@@ -1,0 +1,631 @@
+/* ── Route Creation — Full-screen modal ──────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  background: var(--fv-bg-base);
+  animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Left Panel (form) ───────────────────────────────────────────────────── */
+.leftPanel {
+  width: 420px;
+  min-width: 380px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--fv-border);
+  background: var(--fv-bg-panel);
+  overflow: hidden;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--fv-border);
+  flex-shrink: 0;
+}
+
+.panelHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: var(--fv-text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: all var(--fv-trans-fast);
+}
+
+.backBtn:hover {
+  background: var(--fv-bg-hover);
+  color: var(--fv-text-primary);
+}
+
+.panelTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--fv-text-primary);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--fv-text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: all var(--fv-trans-fast);
+}
+
+.closeBtn:hover {
+  background: var(--fv-bg-hover);
+  color: var(--fv-rose);
+}
+
+/* Scrollable form body */
+.formBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.formLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fv-text-secondary);
+  margin-bottom: 5px;
+}
+
+.formInput {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--fv-bg-base);
+  border: 1px solid var(--fv-border);
+  border-radius: 6px;
+  color: var(--fv-text-primary);
+  font-size: 13px;
+  font-family: var(--fv-font-sans);
+  outline: none;
+  transition: border-color var(--fv-trans-fast), box-shadow var(--fv-trans-fast);
+}
+
+.formInput:focus {
+  border-color: var(--fv-accent);
+  box-shadow: 0 0 0 3px var(--fv-accent-glow);
+}
+
+.formInput::placeholder { color: var(--fv-text-muted); }
+
+.formSelect {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--fv-bg-base);
+  border: 1px solid var(--fv-border);
+  border-radius: 6px;
+  color: var(--fv-text-primary);
+  font-size: 13px;
+  font-family: var(--fv-font-sans);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  transition: border-color var(--fv-trans-fast);
+}
+
+.formSelect:focus {
+  border-color: var(--fv-accent);
+  box-shadow: 0 0 0 3px var(--fv-accent-glow);
+}
+
+.formTextarea {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--fv-bg-base);
+  border: 1px solid var(--fv-border);
+  border-radius: 6px;
+  color: var(--fv-text-primary);
+  font-size: 13px;
+  font-family: var(--fv-font-sans);
+  min-height: 60px;
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--fv-trans-fast);
+}
+
+.formTextarea:focus {
+  border-color: var(--fv-accent);
+  box-shadow: 0 0 0 3px var(--fv-accent-glow);
+}
+
+.formTextarea::placeholder { color: var(--fv-text-muted); }
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Priority selector */
+.priorityRow {
+  display: flex;
+  gap: 6px;
+}
+
+.priorityOption {
+  flex: 1;
+  padding: 7px 0;
+  border: 1px solid var(--fv-border);
+  border-radius: 6px;
+  background: var(--fv-bg-base);
+  color: var(--fv-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+}
+
+.priorityOption:hover {
+  border-color: var(--fv-accent);
+  color: var(--fv-text-primary);
+}
+
+.priorityOptionActive {
+  background: var(--fv-accent);
+  color: #fff;
+  border-color: var(--fv-accent);
+}
+
+/* ── Waypoints Section ───────────────────────────────────────────────────── */
+.wpSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--fv-border);
+}
+
+.wpSectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fv-text-primary);
+}
+
+.wpCount {
+  font-size: 11px;
+  background: var(--fv-accent-subtle);
+  color: var(--fv-accent);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.wpList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.wpCard {
+  background: var(--fv-bg-base);
+  border: 1px solid var(--fv-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition: all var(--fv-trans-fast);
+  position: relative;
+}
+
+.wpCard:hover {
+  border-color: var(--fv-accent);
+}
+
+.wpCardSeq {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, var(--fv-accent));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.wpCardContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.wpCardName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fv-text-primary);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wpCardMeta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wpCardTag {
+  font-size: 10px;
+  color: var(--fv-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.wpCardTypeBadge {
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.wpCardTypeDelivery    { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.wpCardTypePickup      { background: rgba(245,158,11,0.12); color: #f59e0b; }
+.wpCardTypeService     { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+.wpCardTypeCheckpoint  { background: rgba(6,182,212,0.12);  color: #06b6d4; }
+
+.wpCardRemove {
+  background: none;
+  border: none;
+  color: var(--fv-text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: all var(--fv-trans-fast);
+  flex-shrink: 0;
+}
+
+.wpCardRemove:hover {
+  color: var(--fv-rose);
+  background: rgba(239,68,68,0.1);
+}
+
+.addWpBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  background: none;
+  border: 1px dashed var(--fv-border);
+  border-radius: 8px;
+  color: var(--fv-accent);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+  width: 100%;
+  font-family: var(--fv-font-sans);
+}
+
+.addWpBtn:hover {
+  border-color: var(--fv-accent);
+  background: var(--fv-accent-subtle);
+}
+
+/* ── Add Waypoint Subform ─────────────────────────────────────────────────── */
+.wpSubform {
+  background: var(--fv-bg-base);
+  border: 1px solid var(--fv-accent);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+  animation: fv-fadeIn 0.2s ease;
+}
+
+.wpSubformTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fv-text-primary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wpTypeRow {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.wpTypeOption {
+  flex: 1;
+  padding: 6px 0;
+  border: 1px solid var(--fv-border);
+  border-radius: 6px;
+  background: var(--fv-bg-panel);
+  color: var(--fv-text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+}
+
+.wpTypeOption:hover { border-color: var(--fv-accent); }
+
+.wpTypeActive {
+  background: var(--fv-accent);
+  color: #fff;
+  border-color: var(--fv-accent);
+}
+
+.wpSubformRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.wpSubformActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.wpSubformSave {
+  padding: 7px 16px;
+  background: var(--fv-accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--fv-font-sans);
+  transition: all var(--fv-trans-fast);
+}
+
+.wpSubformSave:hover {
+  box-shadow: 0 4px 12px var(--fv-accent-glow);
+}
+
+.wpSubformCancel {
+  padding: 7px 16px;
+  background: none;
+  border: none;
+  color: var(--fv-text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--fv-font-sans);
+}
+
+.wpSubformCancel:hover { color: var(--fv-text-primary); }
+
+.mapHint {
+  font-size: 11px;
+  color: var(--fv-accent);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Collapsible toggle for extra fields */
+.wpSubformToggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--fv-text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 6px 0;
+  margin: 4px 0;
+  font-family: var(--fv-font-sans);
+  transition: color var(--fv-trans-fast);
+}
+
+.wpSubformToggle:hover { color: var(--fv-accent); }
+
+.wpSubformExtra {
+  animation: fv-fadeIn 0.2s ease;
+}
+
+/* ── Route Summary ────────────────────────────────────────────────────────── */
+.routeSummary {
+  margin-top: 20px;
+  padding: 14px;
+  background: var(--fv-bg-base);
+  border: 1px solid var(--fv-border);
+  border-radius: 10px;
+}
+
+.summaryTitle {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--fv-text-muted);
+  margin-bottom: 10px;
+}
+
+.summaryStats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.summaryStat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fv-text-primary);
+}
+
+.summaryStat svg { color: var(--fv-accent); }
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.panelFooter {
+  padding: 16px 20px;
+  border-top: 1px solid var(--fv-border);
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.saveBtn {
+  flex: 1;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--fv-accent), #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.saveBtn:hover {
+  box-shadow: 0 6px 20px var(--fv-accent-glow);
+  transform: translateY(-1px);
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.cancelFormBtn {
+  padding: 10px 20px;
+  background: none;
+  border: 1px solid var(--fv-border);
+  border-radius: 8px;
+  color: var(--fv-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  font-family: var(--fv-font-sans);
+  transition: all var(--fv-trans-fast);
+}
+
+.cancelFormBtn:hover {
+  background: var(--fv-bg-hover);
+  color: var(--fv-text-primary);
+}
+
+/* ── Right Panel (map) ───────────────────────────────────────────────────── */
+.rightPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-width: 0;
+}
+
+.mapContainer {
+  flex: 1;
+  position: relative;
+}
+
+.mapOverlay {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 1000;
+  background: var(--fv-bg-panel);
+  border: 1px solid var(--fv-border-light);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: var(--fv-shadow-md);
+  font-size: 12px;
+  color: var(--fv-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.mapOverlay svg { color: var(--fv-accent); }
+
+/* Leaflet overrides for this modal */
+.mapContainer :global(.leaflet-container) {
+  height: 100% !important;
+  width: 100% !important;
+  border-radius: 0;
+}
+
+/* Numbered waypoint marker on map */
+.waypointMarker {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  border: 2px solid #fff;
+}
+
+.waypointMarkerDelivery   { background: #3b82f6; }
+.waypointMarkerPickup     { background: #f59e0b; }
+.waypointMarkerService    { background: #8b5cf6; }
+.waypointMarkerCheckpoint { background: #06b6d4; }
+
+/* Validation error */
+.validationError {
+  font-size: 11px;
+  color: var(--fv-rose);
+  margin-top: 4px;
+}

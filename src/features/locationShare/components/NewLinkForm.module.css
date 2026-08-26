@@ -1,0 +1,468 @@
+/* ── New Tracking Link Form ────────────────────────────────────────────────── */
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fv-bg-base);
+  overflow: hidden;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  padding: 16px 32px 0;
+  font-size: 12px;
+  color: var(--fv-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breadcrumbLink {
+  color: var(--fv-text-secondary);
+  cursor: pointer;
+  transition: color var(--fv-trans-fast);
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.breadcrumbLink:hover {
+  color: var(--fv-accent);
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 32px 20px;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: var(--fv-text-primary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: background var(--fv-trans-fast);
+}
+
+.backBtn:hover {
+  background: var(--fv-bg-hover);
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fv-text-primary);
+}
+
+/* Content layout */
+.content {
+  flex: 1;
+  display: flex;
+  gap: 32px;
+  padding: 0 32px 24px;
+  overflow: auto;
+}
+
+/* Left form column */
+.formColumn {
+  flex: 1;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Form group */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fv-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.formInput {
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-border-light);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--fv-text-primary);
+  font-family: var(--fv-font-sans);
+  outline: none;
+  transition: border-color var(--fv-trans-fast), box-shadow var(--fv-trans-fast);
+}
+
+.formInput:focus {
+  border-color: var(--fv-accent);
+  box-shadow: 0 0 0 3px var(--fv-accent-glow);
+}
+
+.formInput::placeholder {
+  color: var(--fv-text-muted);
+}
+
+.formTextarea {
+  composes: formInput;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.required {
+  color: var(--fv-rose);
+  margin-left: 2px;
+}
+
+/* Lifespan row */
+.lifespanRow {
+  display: flex;
+  gap: 12px;
+}
+
+.lifespanInput {
+  composes: formInput;
+  width: 120px;
+}
+
+.lifespanSelect {
+  composes: formInput;
+  flex: 1;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 32px;
+}
+
+/* Toggle switches */
+.toggleGroup {
+  margin-top: 20px;
+}
+
+.toggleGroupTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fv-text-primary);
+  margin-bottom: 12px;
+}
+
+.toggleItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.toggleSwitch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.toggleSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleSlider {
+  position: absolute;
+  inset: 0;
+  background: var(--fv-bg-hover);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background var(--fv-trans-fast);
+  border: 1px solid var(--fv-border-light);
+}
+
+.toggleSlider::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--fv-text-secondary);
+  top: 2px;
+  left: 2px;
+  transition: all var(--fv-trans-fast);
+}
+
+.toggleSwitch input:checked + .toggleSlider {
+  background: var(--fv-accent);
+  border-color: var(--fv-accent);
+}
+
+.toggleSwitch input:checked + .toggleSlider::after {
+  left: 18px;
+  background: #fff;
+}
+
+.toggleLabel {
+  font-size: 14px;
+  color: var(--fv-text-primary);
+}
+
+/* Dropdown / Additional properties */
+.dropdown {
+  margin-top: 8px;
+  composes: formInput;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+/* Footer */
+.formFooter {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+}
+
+.saveBtn {
+  padding: 8px 24px;
+  background: var(--fv-bg-card);
+  color: var(--fv-text-primary);
+  border: 1px solid var(--fv-border-light);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+}
+
+.saveBtn:hover {
+  background: var(--fv-bg-hover);
+  border-color: var(--fv-accent);
+}
+
+.cancelBtn {
+  padding: 8px 24px;
+  background: none;
+  color: var(--fv-text-secondary);
+  border: 1px solid var(--fv-border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+  font-family: var(--fv-font-sans);
+}
+
+.cancelBtn:hover {
+  color: var(--fv-text-primary);
+  border-color: var(--fv-border-light);
+}
+
+/* ── Right column: Vehicle selector ────────────────────────────────────────── */
+.vehicleColumn {
+  width: 380px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vehicleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vehicleTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fv-text-primary);
+}
+
+.vehicleTitleRequired {
+  color: var(--fv-rose);
+}
+
+.addVehicleBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, var(--fv-accent), #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+}
+
+.addVehicleBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--fv-accent-glow);
+}
+
+.vehicleSearchBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-border-light);
+  border-radius: 6px;
+  padding: 0 12px;
+  height: 36px;
+}
+
+.vehicleSearchBox svg {
+  color: var(--fv-text-muted);
+  flex-shrink: 0;
+}
+
+.vehicleSearchInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--fv-text-primary);
+  font-size: 13px;
+  font-family: var(--fv-font-sans);
+}
+
+.vehicleSearchInput::placeholder {
+  color: var(--fv-text-muted);
+}
+
+.vehicleHint {
+  font-size: 12px;
+  color: var(--fv-accent);
+}
+
+/* Vehicle list */
+.vehicleList {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--fv-border);
+  border-radius: 8px;
+  background: var(--fv-bg-panel);
+}
+
+.vehicleItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--fv-border);
+  transition: background var(--fv-trans-fast);
+}
+
+.vehicleItem:last-child {
+  border-bottom: none;
+}
+
+.vehicleItem:hover {
+  background: var(--fv-bg-hover);
+}
+
+.vehicleCheckbox {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--fv-border-light);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+  background: var(--fv-bg-card);
+}
+
+.vehicleCheckboxChecked {
+  background: var(--fv-accent);
+  border-color: var(--fv-accent);
+}
+
+.vehicleCheckboxChecked svg {
+  color: #fff;
+}
+
+.vehicleIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vehicleName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fv-text-primary);
+}
+
+/* Select all */
+.selectAll {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--fv-border);
+  background: var(--fv-bg-surface);
+  border-radius: 8px 8px 0 0;
+}
+
+.selectedCount {
+  font-size: 12px;
+  color: var(--fv-accent);
+  font-weight: 500;
+  margin-left: auto;
+}
+
+/* Add button at bottom of vehicle list */
+.vehicleAddBtn {
+  margin-top: 12px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--fv-accent), #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: all var(--fv-trans-fast);
+}
+
+.vehicleAddBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--fv-accent-glow);
+}

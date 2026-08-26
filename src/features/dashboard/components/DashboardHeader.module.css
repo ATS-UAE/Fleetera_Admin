@@ -1,0 +1,75 @@
+.header {
+  height: var(--fv-topbar-h);
+  min-height: var(--fv-topbar-h);
+  max-height: var(--fv-topbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px 0 0;
+  background: var(--fv-bg-surface);
+  border-bottom: 1px solid var(--fv-border);
+  gap: 16px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  z-index: 50;
+}
+
+.tabSection {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.actionSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.filterBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fv-text-secondary);
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-border);
+  border-radius: var(--fv-r-md);
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+}
+
+.filterBtn:hover {
+  border-color: var(--fv-accent);
+  color: var(--fv-accent);
+  background: var(--fv-accent-subtle);
+}
+
+.filterActive {
+  border-color: var(--fv-accent) !important;
+  color: var(--fv-accent) !important;
+  background: var(--fv-accent-subtle) !important;
+}
+
+.filterBadge {
+  background: var(--fv-accent);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  line-height: 1;
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: var(--fv-border);
+  margin: 0 2px;
+}

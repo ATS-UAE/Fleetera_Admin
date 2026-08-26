@@ -1,0 +1,138 @@
+.tabBar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 16px;
+  background: transparent;
+  height: 100%;
+  overflow-x: auto;
+}
+
+.tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fv-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all var(--fv-trans-fast);
+  white-space: nowrap;
+  position: relative;
+  height: 100%;
+}
+
+.tab:hover {
+  color: var(--fv-text-secondary);
+  background: var(--fv-bg-hover);
+}
+
+.active {
+  color: var(--fv-text-primary) !important;
+  border-bottom-color: var(--fv-accent) !important;
+  font-weight: 600;
+}
+
+.tabLabel {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tabInput {
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-accent);
+  border-radius: 4px;
+  color: var(--fv-text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 1px 5px;
+  width: 100px;
+  outline: none;
+}
+
+.favStar {
+  color: var(--fv-amber);
+  flex-shrink: 0;
+}
+
+.tabMenuBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--fv-text-muted);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity var(--fv-trans-fast);
+}
+
+.tab:hover .tabMenuBtn {
+  opacity: 1;
+}
+
+.tabMenuBtn:hover {
+  background: var(--fv-bg-active);
+  color: var(--fv-text-primary);
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--fv-bg-card);
+  border: 1px dashed var(--fv-border);
+  border-radius: var(--fv-r-sm);
+  color: var(--fv-text-muted);
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+  flex-shrink: 0;
+}
+
+.addBtn:hover {
+  border-color: var(--fv-accent);
+  color: var(--fv-accent);
+  background: var(--fv-accent-subtle);
+}
+
+.menuDropdown {
+  background: var(--fv-bg-panel) !important;
+  border: 1px solid var(--fv-border-light) !important;
+}
+
+.createBtn {
+  padding: 8px 16px;
+  background: var(--fv-accent);
+  color: white;
+  border: none;
+  border-radius: var(--fv-r-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--fv-trans-fast);
+  margin-top: 4px;
+}
+
+.createBtn:hover:not(:disabled) {
+  background: var(--fv-accent-dim);
+}
+
+.createBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

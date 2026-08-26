@@ -1,0 +1,59 @@
+.stat {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+  border: 1px solid;
+  border-radius: var(--fv-r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.trend {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.trendUp {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.trendDown {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--fv-text-primary);
+  font-family: var(--fv-font-mono);
+  line-height: 1.1;
+}
+
+.sub {
+  font-size: 10px;
+  color: var(--fv-text-muted);
+  margin-top: 4px;
+}
