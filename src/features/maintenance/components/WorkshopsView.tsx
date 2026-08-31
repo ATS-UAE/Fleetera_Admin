@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, TextInput, ActionIcon, Badge, Table, Text, Tooltip, ScrollArea } from '@mantine/core';
+import { Button, TextInput, ActionIcon, Badge, Table, Text, Tooltip, ScrollArea, Group } from '@mantine/core';
 import {
   IconSearch, IconBuildingWarehouse, IconMapPin,
   IconTrash, IconPlus, IconX,
@@ -10,10 +10,19 @@ import type { Workshop } from '@/store/slices/maintenanceSlice';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
 import type { DeleteConfirmItem } from '@/components/DeleteConfirmModal';
 import WorkshopFormPage from './WorkshopFormPage';
+import { useTableColumns } from '../hooks/useTableColumns';
+import ColumnConfigButton from './ColumnConfigButton';
+import SortableTh from './SortableTh';
+import type { SortState } from './SortableTh';
 import styles from './MaintenancePage.module.css';
 
 const TYPE_OPTIONS = ['all', 'internal', 'external'] as const;
 const TYPE_LABELS: Record<string, string> = { all: 'All', internal: 'Internal', external: 'External' };
+
+const COLUMNS = [
+  { key: 'location', label: 'Location' },
+  { key: 'type', label: 'Type' },
+];
 
 export default function WorkshopsView() {
   const dispatch = useDispatch();
@@ -22,16 +31,36 @@ export default function WorkshopsView() {
   const [editing, setEditing] = useState<Workshop | null>(null);
   const [search, setSearch] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; item: DeleteConfirmItem | null; id: string | null }>({ open: false, item: null, id: null });
+  const [sort, setSort] = useState<SortState | null>(null);
+  const { isVisible, toggle } = useTableColumns('workshops');
 
   if (view === 'form') {
     return <WorkshopFormPage workshop={editing} onBack={() => { setView('list'); setEditing(null); }} />;
   }
 
-  const filtered: Workshop[] = workshops.filter((w: Workshop) => {
+  const handleSort = (key: string) => {
+    setSort(prev => {
+      if (prev?.key !== key) return { key, dir: 'asc' };
+      if (prev.dir === 'asc') return { key, dir: 'desc' };
+      return null;
+    });
+  };
+
+  let filtered: Workshop[] = workshops.filter((w: Workshop) => {
     const matchesType = workshopTypeFilter === 'all' || w.type === workshopTypeFilter;
     const matchesSearch = !search || w.name.toLowerCase().includes(search.toLowerCase());
     return matchesType && matchesSearch;
   });
+
+  if (sort) {
+    filtered = [...filtered].sort((a, b) => {
+      const av = (a as any)[sort.key === 'name' ? 'name' : sort.key]?.toString().toLowerCase() || '';
+      const bv = (b as any)[sort.key === 'name' ? 'name' : sort.key]?.toString().toLowerCase() || '';
+      if (av < bv) return sort.dir === 'asc' ? -1 : 1;
+      if (av > bv) return sort.dir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
 
   const requestDelete = (w: Workshop) => {
     setDeleteConfirm({ open: true, item: { name: w.name, meta: w.location || undefined }, id: w.id });
@@ -45,7 +74,6 @@ export default function WorkshopsView() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', flex: 1, minHeight: 0 }}>
     <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 32px 32px' }}>
       <Button
-        color="green"
         leftSection={<IconPlus size={14} />}
         onClick={() => { setEditing(null); setView('form'); }}
         mb="md"
@@ -82,6 +110,8 @@ export default function WorkshopsView() {
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <Text fw={600}>Workshops</Text>
+        <Group gap={8}>
+        <ColumnConfigButton columns={COLUMNS} isVisible={isVisible} onToggle={toggle} />
         <TextInput
           placeholder="Search workshops..."
           leftSection={<IconSearch size={14} />}
@@ -105,6 +135,7 @@ export default function WorkshopsView() {
             section: { color: 'var(--fv-text-muted)' },
           }}
         />
+        </Group>
       </div>
 
       <div style={{
@@ -137,9 +168,9 @@ export default function WorkshopsView() {
           >
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Location</Table.Th>
-                <Table.Th>Type</Table.Th>
+                <SortableTh label="Name" sortKey="name" sort={sort} onSort={handleSort} />
+                {isVisible('location') && <SortableTh label="Location" sortKey="location" sort={sort} onSort={handleSort} />}
+                {isVisible('type') && <SortableTh label="Type" sortKey="type" sort={sort} onSort={handleSort} />}
                 <Table.Th style={{ width: 48 }} />
               </Table.Tr>
             </Table.Thead>
@@ -149,28 +180,32 @@ export default function WorkshopsView() {
                   <Table.Td>
                     <span className={styles.serviceName}>{w.name}</span>
                   </Table.Td>
-                  <Table.Td>
-                    {w.location ? (
-                      <Tooltip label={w.location} openDelay={300} multiline w={280} disabled={w.location.length < 45}>
-                        <div style={{
-                          display: 'flex', alignItems: 'center', gap: 6,
-                          color: 'var(--fv-text-secondary)', maxWidth: 360,
-                        }}>
-                          <IconMapPin size={13} style={{ opacity: 0.6, flexShrink: 0 }} />
-                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {w.location}
-                          </span>
-                        </div>
-                      </Tooltip>
-                    ) : (
-                      <Text c="dimmed" size="sm">—</Text>
-                    )}
-                  </Table.Td>
-                  <Table.Td>
-                    <Badge color={w.type === 'internal' ? 'blue' : 'orange'} variant="light" radius="sm">
-                      {TYPE_LABELS[w.type]}
-                    </Badge>
-                  </Table.Td>
+                  {isVisible('location') && (
+                    <Table.Td>
+                      {w.location ? (
+                        <Tooltip label={w.location} openDelay={300} multiline w={280} disabled={w.location.length < 45}>
+                          <div style={{
+                            display: 'flex', alignItems: 'center', gap: 6,
+                            color: 'var(--fv-text-secondary)', maxWidth: 360,
+                          }}>
+                            <IconMapPin size={13} style={{ opacity: 0.6, flexShrink: 0 }} />
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {w.location}
+                            </span>
+                          </div>
+                        </Tooltip>
+                      ) : (
+                        <Text c="dimmed" size="sm">—</Text>
+                      )}
+                    </Table.Td>
+                  )}
+                  {isVisible('type') && (
+                    <Table.Td>
+                      <Badge color={w.type === 'internal' ? 'blue' : 'orange'} variant="light" radius="sm">
+                        {TYPE_LABELS[w.type]}
+                      </Badge>
+                    </Table.Td>
+                  )}
                   <Table.Td onClick={e => e.stopPropagation()}>
                     <ActionIcon variant="subtle" color="red" onClick={() => requestDelete(w)}>
                       <IconTrash size={14} />

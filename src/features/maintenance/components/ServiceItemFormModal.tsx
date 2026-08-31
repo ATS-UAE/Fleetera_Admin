@@ -115,7 +115,7 @@ export default function ServiceItemFormModal({ opened, onClose, item, workshops,
             <Group mb="md" gap={10}>
               <div style={{
                 width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                background: 'var(--mantine-color-green-6)', color: '#fff',
+                background: 'var(--fv-accent)', color: '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 <IconSettings2 size={16} />
@@ -177,7 +177,7 @@ export default function ServiceItemFormModal({ opened, onClose, item, workshops,
               <Group gap={10}>
                 <div style={{
                   width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                  background: 'var(--mantine-color-green-6)', color: '#fff',
+                  background: 'var(--fv-accent)', color: '#fff',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <IconList size={16} />
@@ -186,7 +186,6 @@ export default function ServiceItemFormModal({ opened, onClose, item, workshops,
               </Group>
               <Button
                 variant="outline"
-                color="green"
                 size="xs"
                 leftSection={<IconPlus size={14} />}
                 onClick={() => form.insertListItem('stockEntries', { id: uuidv4(), date: null, quantity: 0 })}
@@ -242,7 +241,7 @@ export default function ServiceItemFormModal({ opened, onClose, item, workshops,
 
         <Group justify="center" mt="lg">
           <Button variant="default" onClick={onClose}>Cancel</Button>
-          <Button type="submit" color="green">Save</Button>
+          <Button type="submit">Save</Button>
         </Group>
       </form>
     </Modal>

@@ -211,7 +211,7 @@ export default function ServiceFormPage({ service, onBack }: ServiceFormPageProp
           <Group gap={12}>
             <div style={{
               width: 36, height: 36, borderRadius: 8,
-              background: 'var(--mantine-color-green-6)',
+              background: 'var(--fv-accent)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff',
             }}>
               <IconTool size={18} />
@@ -236,7 +236,7 @@ export default function ServiceFormPage({ service, onBack }: ServiceFormPageProp
               </Badge>
             )}
           </Group>
-        </div>jpshankari
+        </div>
 
         <SimpleGrid cols={3} spacing="md" style={{ alignItems: 'start' }}>
           <div style={{ gridColumn: 'span 2' }}>
@@ -402,7 +402,6 @@ export default function ServiceFormPage({ service, onBack }: ServiceFormPageProp
 
               <Button
                 variant="outline"
-                color="green"
                 fullWidth
                 leftSection={<IconPlus size={14} />}
                 onClick={() => form.insertListItem('usedItems', { id: uuidv4(), itemId: '', qty: 1 })}
@@ -488,7 +487,7 @@ export default function ServiceFormPage({ service, onBack }: ServiceFormPageProp
               <Group gap={10} mb="md">
                 <div style={{
                   width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                  background: 'var(--mantine-color-green-6)', color: '#fff',
+                  background: 'var(--fv-accent)', color: '#fff',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <IconUpload size={14} />
@@ -549,7 +548,6 @@ export default function ServiceFormPage({ service, onBack }: ServiceFormPageProp
         }}
       >
         <Button
-          color="green"
           radius="md"
           leftSection={<IconDeviceFloppy size={14} />}
           disabled={!canSave}

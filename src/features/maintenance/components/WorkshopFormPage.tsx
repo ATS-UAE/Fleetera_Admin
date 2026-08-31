@@ -187,7 +187,7 @@ export default function WorkshopFormPage({ workshop, onBack }: WorkshopFormPageP
                     <IconMapPin size={16} />
                   </div>
                   <Text size="sm" fw={600} style={{ flex: 1 }}>{location}</Text>
-                  <Button size="xs" variant="light" color="green" onClick={() => setPickerOpen(true)}>
+                  <Button size="xs" variant="light" onClick={() => setPickerOpen(true)}>
                     Change
                   </Button>
                 </div>
@@ -198,7 +198,7 @@ export default function WorkshopFormPage({ workshop, onBack }: WorkshopFormPageP
                 }}>
                   <IconMapPin size={28} style={{ opacity: 0.35 }} />
                   <Text size="sm" c="dimmed" mt={8} mb={12}>No location set.</Text>
-                  <Button variant="outline" color="green" onClick={() => setPickerOpen(true)}>
+                  <Button variant="outline" onClick={() => setPickerOpen(true)}>
                     Pick on map
                   </Button>
                 </div>
@@ -226,7 +226,6 @@ export default function WorkshopFormPage({ workshop, onBack }: WorkshopFormPageP
         }}
       >
         <Button
-          color="green"
           radius="md"
           disabled={!canSave}
           onClick={handleSave}

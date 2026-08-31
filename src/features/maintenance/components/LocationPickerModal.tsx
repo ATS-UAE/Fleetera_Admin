@@ -167,7 +167,7 @@ export default function LocationPickerModal({ opened, onClose, initial, onConfir
             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
             onBlur={() => setShowSuggestions(false)}
           />
-          <ActionIcon size="lg" color="green" onClick={handleSearch} loading={searching}>
+          <ActionIcon size="lg" onClick={handleSearch} loading={searching}>
             <IconArrowRight size={16} />
           </ActionIcon>
         </Group>
@@ -217,12 +217,12 @@ export default function LocationPickerModal({ opened, onClose, initial, onConfir
         <div style={{
           display: 'flex', alignItems: 'center', gap: 12,
           padding: '12px 16px', borderRadius: 8, marginTop: 12,
-          border: '1px solid var(--mantine-color-green-6)',
-          background: 'var(--mantine-color-green-light)',
+          border: '1px solid var(--fv-accent)',
+          background: 'var(--mantine-color-blue-light)',
         }}>
           <div style={{
             width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-            background: 'var(--mantine-color-green-6)', color: '#fff',
+            background: 'var(--fv-accent)', color: '#fff',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <IconMapPin size={16} />
@@ -234,8 +234,8 @@ export default function LocationPickerModal({ opened, onClose, initial, onConfir
             <Text size="xs" c="dimmed">{pin[0].toFixed(5)}, {pin[1].toFixed(5)}</Text>
           </div>
           <Group gap={4} wrap="nowrap" style={{ flexShrink: 0 }}>
-            <IconCheck size={14} color="var(--mantine-color-green-6)" />
-            <Text size="xs" fw={600} c="green">Selected</Text>
+            <IconCheck size={14} color="var(--fv-accent)" />
+            <Text size="xs" fw={600} c="blue">Selected</Text>
           </Group>
         </div>
       )}
@@ -248,7 +248,7 @@ export default function LocationPickerModal({ opened, onClose, initial, onConfir
 
       <Group justify="center">
         <Button variant="default" onClick={onClose}>Cancel</Button>
-        <Button color="green" onClick={handleConfirm} loading={confirming} disabled={!pin}>
+        <Button onClick={handleConfirm} loading={confirming} disabled={!pin}>
           Confirm location
         </Button>
       </Group>

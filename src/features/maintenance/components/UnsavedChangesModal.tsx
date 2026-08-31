@@ -42,7 +42,7 @@ export default function UnsavedChangesModal({ opened, onSave, onDiscard, onCance
         <Group justify="center" gap={10}>
           <Button variant="default" onClick={onCancel}>Keep editing</Button>
           <Button variant="outline" color="red" onClick={onDiscard}>Discard</Button>
-          <Button color="green" onClick={onSave}>Save</Button>
+          <Button onClick={onSave}>Save</Button>
         </Group>
       </div>
     </Modal>

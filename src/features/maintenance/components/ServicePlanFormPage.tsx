@@ -285,7 +285,7 @@ export default function ServicePlanFormPage({ plan, onBack, initialTab }: Servic
           <Group gap={12}>
             <div style={{
               width: 36, height: 36, borderRadius: 8,
-              background: 'var(--mantine-color-green-6)',
+              background: 'var(--fv-accent)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff',
             }}>
               <IconListDetails size={18} />
@@ -376,7 +376,7 @@ export default function ServicePlanFormPage({ plan, onBack, initialTab }: Servic
                 <Group gap={10}>
                   <div style={{
                     width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                    background: 'var(--mantine-color-green-6)', color: '#fff',
+                    background: 'var(--fv-accent)', color: '#fff',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <IconCar size={16} />
@@ -489,7 +489,7 @@ export default function ServicePlanFormPage({ plan, onBack, initialTab }: Servic
               <Group gap={10} mb="md">
                 <div style={{
                   width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                  background: 'var(--mantine-color-green-6)', color: '#fff',
+                  background: 'var(--fv-accent)', color: '#fff',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <IconCar size={16} />
@@ -563,7 +563,7 @@ export default function ServicePlanFormPage({ plan, onBack, initialTab }: Servic
                             <Group gap={8} wrap="nowrap">
                               <div style={{
                                 width: 24, height: 24, borderRadius: 6, flexShrink: 0,
-                                background: 'var(--mantine-color-green-6)', color: '#fff',
+                                background: 'var(--fv-accent)', color: '#fff',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                               }}>
                                 <IconCar size={12} />
@@ -678,7 +678,6 @@ export default function ServicePlanFormPage({ plan, onBack, initialTab }: Servic
         }}
       >
         <Button
-          color="green"
           radius="md"
           leftSection={<IconDeviceFloppy size={14} />}
           disabled={!canSave}

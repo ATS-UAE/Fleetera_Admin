@@ -5,14 +5,24 @@ import {
 } from '@mantine/core';
 import {
   IconSearch, IconFilter, IconX,
-  IconTrash, IconPlus, IconAlertTriangle, IconBuildingWarehouse,
+  IconTrash, IconPlus, IconAlertTriangle, IconBuildingWarehouse, IconBoxSeam,
 } from '@tabler/icons-react';
 import { deleteServiceItem, setServiceItemWorkshopFilter, getAvailableQty } from '@/store/slices/maintenanceSlice';
 import type { ServiceItemEntry, Workshop } from '@/store/slices/maintenanceSlice';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
 import type { DeleteConfirmItem } from '@/components/DeleteConfirmModal';
 import ServiceItemFormModal from './ServiceItemFormModal';
+import { useTableColumns } from '../hooks/useTableColumns';
+import ColumnConfigButton from './ColumnConfigButton';
+import SortableTh from './SortableTh';
+import type { SortState } from './SortableTh';
+import TableFilterButton from './TableFilterButton';
+import type { FilterDef } from './TableFilterButton';
 import styles from './MaintenancePage.module.css';
+
+const TYPE_FILTER: FilterDef[] = [
+  { key: 'type', label: 'Type', options: [{ value: 'Part', label: 'Part' }, { value: 'Labour', label: 'Labour' }] },
+];
 
 function WorkshopCell({ workshop }: { workshop: Workshop | undefined }) {
   if (!workshop) {
@@ -38,6 +48,13 @@ interface ServiceItemsViewProps {
   embedded?: boolean;
 }
 
+const COLUMNS_BASE = [
+  { key: 'type', label: 'Type' },
+  { key: 'unit', label: 'Unit' },
+  { key: 'available', label: 'Available' },
+];
+const WORKSHOP_COLUMN = { key: 'workshop', label: 'Workshop' };
+
 export default function ServiceItemsView({ workshopId, embedded }: ServiceItemsViewProps = {}) {
   const dispatch = useDispatch();
   const { serviceItems, workshops, serviceItemWorkshopFilter } = useSelector((s: any) => s.maintenance);
@@ -45,17 +62,51 @@ export default function ServiceItemsView({ workshopId, embedded }: ServiceItemsV
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<ServiceItemEntry | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; item: DeleteConfirmItem | null; id: string | null }>({ open: false, item: null, id: null });
+  const [sort, setSort] = useState<SortState | null>(null);
+  const [typeFilter, setTypeFilter] = useState<string[]>([]);
+  const { isVisible, toggle } = useTableColumns('serviceItems');
+
+  const COLUMNS = workshopId ? COLUMNS_BASE : [...COLUMNS_BASE, WORKSHOP_COLUMN];
+
+  const handleSort = (key: string) => {
+    setSort(prev => {
+      if (prev?.key !== key) return { key, dir: 'asc' };
+      if (prev.dir === 'asc') return { key, dir: 'desc' };
+      return null;
+    });
+  };
 
   const workshopOptions = workshops.map((w: Workshop) => ({ value: w.id, label: w.name }));
 
-  const filtered: ServiceItemEntry[] = serviceItems.filter((si: ServiceItemEntry) => {
+  let filtered: ServiceItemEntry[] = serviceItems.filter((si: ServiceItemEntry) => {
     const matchesWorkshop = workshopId
       ? si.workshopId === workshopId
       : (serviceItemWorkshopFilter.length === 0 ||
           (si.workshopId && serviceItemWorkshopFilter.includes(si.workshopId)));
     const matchesSearch = !search || si.name.toLowerCase().includes(search.toLowerCase());
-    return matchesWorkshop && matchesSearch;
+    const matchesType = typeFilter.length === 0 || typeFilter.includes(si.type);
+    return matchesWorkshop && matchesSearch && matchesType;
   });
+
+  if (sort) {
+    filtered = [...filtered].sort((a, b) => {
+      const getVal = (si: ServiceItemEntry) => {
+        if (sort.key === 'available') return getAvailableQty(si);
+        if (sort.key === 'workshop') return workshops.find((w: Workshop) => w.id === si.workshopId)?.name || '';
+        return (si as any)[sort.key] ?? '';
+      };
+      const av = getVal(a);
+      const bv = getVal(b);
+      if (typeof av === 'number' && typeof bv === 'number') {
+        return sort.dir === 'asc' ? av - bv : bv - av;
+      }
+      const as = av.toString().toLowerCase();
+      const bs = bv.toString().toLowerCase();
+      if (as < bs) return sort.dir === 'asc' ? -1 : 1;
+      if (as > bs) return sort.dir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
 
   const requestDelete = (item: ServiceItemEntry) => {
     setDeleteConfirm({ open: true, item: { name: item.name, meta: `${item.type} · ${getAvailableQty(item)} ${item.unit}` }, id: item.id });
@@ -69,7 +120,6 @@ export default function ServiceItemsView({ workshopId, embedded }: ServiceItemsV
     <div style={embedded ? undefined : { display: 'flex', flexDirection: 'column', height: '100%', flex: 1, minHeight: 0 }}>
     <div style={embedded ? undefined : { flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 32px 32px' }}>
       <Button
-        color="green"
         leftSection={<IconPlus size={14} />}
         onClick={() => { setEditing(null); setFormOpen(true); }}
         mb="md"
@@ -78,9 +128,25 @@ export default function ServiceItemsView({ workshopId, embedded }: ServiceItemsV
       </Button>
 
       {!workshopId && (
+        <div className={styles.planCard} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: 8, flexShrink: 0,
+            background: 'var(--fv-accent)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff',
+          }}>
+            <IconBoxSeam size={18} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 14 }}>Service items</div>
+            <div style={{ fontSize: 12, color: 'var(--fv-text-muted)' }}>Track parts and stock available across your workshops</div>
+          </div>
+        </div>
+      )}
+
+      {!workshopId && (
         <div className={styles.planCard} style={{ marginBottom: 20, maxWidth: 420 }}>
           <Group mb={10} gap={8}>
-            <ActionIcon variant="filled" color="green" radius="sm" size="sm">
+            <ActionIcon variant="filled" radius="sm" size="sm">
               <IconFilter size={12} />
             </ActionIcon>
             <Text fw={600} size="sm">Filter by workshop</Text>
@@ -99,29 +165,37 @@ export default function ServiceItemsView({ workshopId, embedded }: ServiceItemsV
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <Text fw={600}>Service items</Text>
-        <TextInput
-          placeholder="Search service items..."
-          leftSection={<IconSearch size={14} />}
-          rightSection={search ? (
-            <ActionIcon variant="subtle" color="gray" size="sm" onClick={() => setSearch('')}>
-              <IconX size={13} />
-            </ActionIcon>
-          ) : null}
-          value={search}
-          onChange={e => setSearch(e.currentTarget.value)}
-          radius="md"
-          styles={{
-            root: { width: 260 },
-            input: {
-              background: 'var(--fv-bg-panel)',
-              border: '1px solid var(--fv-border)',
-              color: 'var(--fv-text-primary)',
-              height: 36,
-              fontSize: 13,
-            },
-            section: { color: 'var(--fv-text-muted)' },
-          }}
-        />
+        <Group gap={8}>
+          <ColumnConfigButton columns={COLUMNS} isVisible={isVisible} onToggle={toggle} />
+          <TableFilterButton
+            filters={TYPE_FILTER}
+            values={{ type: typeFilter }}
+            onChange={(_key, val) => setTypeFilter(val)}
+          />
+          <TextInput
+            placeholder="Search service items..."
+            leftSection={<IconSearch size={14} />}
+            rightSection={search ? (
+              <ActionIcon variant="subtle" color="gray" size="sm" onClick={() => setSearch('')}>
+                <IconX size={13} />
+              </ActionIcon>
+            ) : null}
+            value={search}
+            onChange={e => setSearch(e.currentTarget.value)}
+            radius="md"
+            styles={{
+              root: { width: 260 },
+              input: {
+                background: 'var(--fv-bg-panel)',
+                border: '1px solid var(--fv-border)',
+                color: 'var(--fv-text-primary)',
+                height: 36,
+                fontSize: 13,
+              },
+              section: { color: 'var(--fv-text-muted)' },
+            }}
+          />
+        </Group>
       </div>
 
       <div style={{
@@ -154,11 +228,11 @@ export default function ServiceItemsView({ workshopId, embedded }: ServiceItemsV
           >
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Type</Table.Th>
-                <Table.Th>Unit</Table.Th>
-                <Table.Th>Available</Table.Th>
-                {!workshopId && <Table.Th>Workshop</Table.Th>}
+                <SortableTh label="Name" sortKey="name" sort={sort} onSort={handleSort} />
+                {isVisible('type') && <SortableTh label="Type" sortKey="type" sort={sort} onSort={handleSort} />}
+                {isVisible('unit') && <SortableTh label="Unit" sortKey="unit" sort={sort} onSort={handleSort} />}
+                {isVisible('available') && <SortableTh label="Available" sortKey="available" sort={sort} onSort={handleSort} />}
+                {!workshopId && isVisible('workshop') && <SortableTh label="Workshop" sortKey="workshop" sort={sort} onSort={handleSort} />}
                 <Table.Th style={{ width: 48 }} />
               </Table.Tr>
             </Table.Thead>
@@ -172,10 +246,10 @@ export default function ServiceItemsView({ workshopId, embedded }: ServiceItemsV
                     onClick={() => { setEditing(item); setFormOpen(true); }}
                   >
                     <Table.Td>{item.name}</Table.Td>
-                    <Table.Td><Badge variant="light" color="gray">{item.type}</Badge></Table.Td>
-                    <Table.Td>{item.unit || '—'}</Table.Td>
-                    <Table.Td>{getAvailableQty(item)}</Table.Td>
-                    {!workshopId && <Table.Td><WorkshopCell workshop={workshop} /></Table.Td>}
+                    {isVisible('type') && <Table.Td><Badge variant="light" color="gray">{item.type}</Badge></Table.Td>}
+                    {isVisible('unit') && <Table.Td>{item.unit || '—'}</Table.Td>}
+                    {isVisible('available') && <Table.Td>{getAvailableQty(item)}</Table.Td>}
+                    {!workshopId && isVisible('workshop') && <Table.Td><WorkshopCell workshop={workshop} /></Table.Td>}
                     <Table.Td onClick={e => e.stopPropagation()}>
                       <ActionIcon variant="subtle" color="red" onClick={() => requestDelete(item)}>
                         <IconTrash size={14} />
