@@ -176,12 +176,12 @@ export default function WorkshopFormPage({ workshop, onBack }: WorkshopFormPageP
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 12,
                   padding: '12px 16px', borderRadius: 8,
-                  border: '1px solid var(--mantine-color-green-6)',
-                  background: 'var(--mantine-color-green-light)',
+                  border: '1px solid var(--fv-accent)',
+                  background: 'var(--mantine-color-blue-light)',
                 }}>
                   <div style={{
                     width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                    background: 'var(--mantine-color-green-6)', color: '#fff',
+                    background: 'var(--fv-accent)', color: '#fff',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <IconMapPin size={16} />
