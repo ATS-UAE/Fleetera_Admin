@@ -1,21 +1,22 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Checkbox, Popover, Slider, Tooltip } from '@mantine/core';
+import { Button, Checkbox, Popover, Slider, TextInput, Tooltip } from '@mantine/core';
 import { DatePicker, TimeInput } from '@mantine/dates';
 import {
   IconPlayerPlay, IconPlayerPause, IconPlayerSkipBack, IconPlayerSkipForward,
   IconRoute, IconTruck, IconChevronUp, IconChevronDown, IconCalendar,
   IconFocus2, IconX, IconZoomReset, IconBattery, IconCircle, IconCircleFilled,
+  IconSearch,
 } from '@tabler/icons-react';
 import L from 'leaflet';
 import { setVehicles, removeVehicle, setDateRange, loadRoutes, mergeRoutes, setPlaying, setSpeed, setCurrentTs, tick, reset } from '@/store/slices/trackPlayerSlice';
 import { createVehiclePuckIcon, ensurePuckStyles } from '@/lib/mapUtils/vehicleIcon';
 import { getVehicleTrackData, formatTrackDuration as formatDuration } from '@/data';
-import type { TrackDataPoint } from '@/types';
+import type { TrackDataPoint, TrackStatus, RootState } from '@/types';
 import styles from './TrackPlayer.module.css';
 
 const ROUTE_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899', '#84cc16'];
-function colorForIndex(i) { return ROUTE_COLORS[i % ROUTE_COLORS.length]; }
+function colorForIndex(i: number): string { return ROUTE_COLORS[i % ROUTE_COLORS.length]; }
 
 const TICK_INTERVAL_MS = 150;
 const MIN_ZOOM_SPAN = 0.02; // smallest visible window: 2% of the full loaded range
@@ -85,40 +86,57 @@ function findIndexForTs(route: TrackDataPoint[], ts: number): number {
   return lo;
 }
 
-const formatHour = (ts) => ts ? new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
+const formatHour = (ts: number): string => ts ? new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
 
-const pad2 = (n) => String(n).padStart(2, '0');
-const formatDateTime = (ts) => {
+const pad2 = (n: number): string => String(n).padStart(2, '0');
+const formatDateTime = (ts: number): string => {
   const d = new Date(ts);
   return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 };
-const formatDateTimeWithSeconds = (ts) => `${formatDateTime(ts)}:${pad2(new Date(ts).getSeconds())}`;
-const formatRangeHeader = (startTs, endTs) => `${formatDateTime(startTs)} – ${pad2(new Date(endTs).getHours())}:${pad2(new Date(endTs).getMinutes())}`;
-const formatDurationLong = (ms) => {
+const formatDateTimeWithSeconds = (ts: number): string => `${formatDateTime(ts)}:${pad2(new Date(ts).getSeconds())}`;
+const formatRangeHeader = (startTs: number, endTs: number): string => `${formatDateTime(startTs)} – ${pad2(new Date(endTs).getHours())}:${pad2(new Date(endTs).getMinutes())}`;
+const formatDurationLong = (ms: number): string => {
   const totalSec = Math.round(ms / 1000);
   const m = Math.floor(totalSec / 60), s = totalSec % 60;
   return `${m} mins ${s} secs`;
 };
-const toHHMM = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+const toHHMM = (date: Date): string => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 
-function combineDateAndTime(date, hhmm) {
+function combineDateAndTime(date: Date, hhmm: string): Date {
   const [h, m] = hhmm.split(':').map(Number);
   const combined = new Date(date);
   combined.setHours(h || 0, m || 0, 0, 0);
   return combined;
 }
 
-const DATE_PRESETS = [
-  {label:'Today', amount: 0, unit: 'today'},
+type PresetUnit = 'today' | 'hours' | 'days';
+interface DatePreset {
+  label: string;
+  amount: number;
+  unit: PresetUnit;
+}
+
+const DATE_PRESETS: DatePreset[] = [
+  { label: 'Today', amount: 0, unit: 'today' },
   { label: 'Last 2 hours', amount: 2, unit: 'hours' },
   { label: 'Last 4 hours', amount: 4, unit: 'hours' },
   { label: 'Last 8 hours', amount: 8, unit: 'hours' },
   { label: 'Last 24 hours', amount: 24, unit: 'hours' },
-  { label: 'Last 2 days', amount: 2, unit: 'days'}
+  { label: 'Last 2 days', amount: 2, unit: 'days' },
 ];
 
-const STATUS_COLORS = { trip: '#3b82f6', parking: '#10b981', idle: '#f59e0b' };
-const STATUS_LABELS = { trip: 'On trip', parking: 'Parked', idle: 'Idle' };
+const STATUS_COLORS: Record<TrackStatus, string> = { trip: '#3b82f6', parking: '#10b981', idle: '#f59e0b' };
+const STATUS_LABELS: Record<TrackStatus, string> = { trip: 'On trip', parking: 'Parked', idle: 'Idle' };
+
+interface TrackSegment {
+  label: string;
+  kind: string;
+  color: string;
+  start: number;
+  end: number;
+  startTs: number;
+  endTs: number;
+}
 
 // Scans the flattened route for runs of consecutive points sharing the same
 // status, so a vehicle with several real trips/parks over the loaded window
@@ -127,9 +145,9 @@ const STATUS_LABELS = { trip: 'On trip', parking: 'Parked', idle: 'Idle' };
 // segments share an exact boundary — otherwise the point-to-point gap between
 // the last point of one run and the first of the next left a visible sliver of
 // empty track between segments that should have been touching.
-function deriveTripParkSegments(route) {
+function deriveTripParkSegments(route: TrackDataPoint[]): TrackSegment[] {
   if (route.length === 0) return [];
-  const segments = [];
+  const segments: TrackSegment[] = [];
   let runStart = 0;
   for (let i = 1; i <= route.length; i++) {
     if (i === route.length || route[i].status !== route[runStart].status) {
@@ -151,9 +169,9 @@ function deriveTripParkSegments(route) {
 }
 
 // Same run-length approach, grouped by which named geofence (if any) each point falls in.
-function deriveGeofenceSegments(route) {
+function deriveGeofenceSegments(route: TrackDataPoint[]): TrackSegment[] {
   if (route.length === 0) return [];
-  const segments = [];
+  const segments: TrackSegment[] = [];
   let runStart = 0;
   for (let i = 1; i <= route.length; i++) {
     const curName = route[i]?.geofenceName || null;
@@ -174,11 +192,23 @@ function deriveGeofenceSegments(route) {
   return segments;
 }
 
-function TrackBar({ route, segments, segKeyPrefix, category, toView, onWheelZoom, globalMinTs, globalSpan, onSegmentClick }) {
+interface TrackBarProps {
+  route: TrackDataPoint[];
+  segments: TrackSegment[];
+  segKeyPrefix: string;
+  category: string;
+  toView: (frac: number) => number;
+  onWheelZoom: (e: React.WheelEvent<HTMLDivElement>) => void;
+  globalMinTs: number;
+  globalSpan: number;
+  onSegmentClick: (seg: TrackSegment, category: string) => void;
+}
+
+function TrackBar({ segments, segKeyPrefix, category, toView, onWheelZoom, globalMinTs, globalSpan, onSegmentClick }: TrackBarProps) {
   // Total time spent in each kind (Trip/Parked/Idle, or Inside/Outside geofence)
   // across the whole loaded window, so hovering one segment also shows how it
   // adds up across every occurrence of that kind, not just its own duration.
-  const totalsByKind = {};
+  const totalsByKind: Record<string, number> = {};
   segments.forEach(s => {
     totalsByKind[s.kind] = (totalsByKind[s.kind] || 0) + Math.max(0, s.endTs - s.startTs);
   });
@@ -204,9 +234,10 @@ function TrackBar({ route, segments, segKeyPrefix, category, toView, onWheelZoom
           <Tooltip
             key={key}
             position="top" withArrow
+            classNames={{ tooltip: styles.trackTooltip }}
             label={
               <div className={styles.durationPopup}>
-                <div className={styles.durationCategory}>{category}</div>
+                <div className={styles.durationCategory}>{seg.kind}</div>
                 <div className={styles.durationLabel}>{seg.label}</div>
                 <div className={styles.durationValue}>{formatDuration(durationMs)}</div>
                 <div className={styles.durationTotal}>Total {seg.kind}: {formatDuration(totalsByKind[seg.kind])}</div>
@@ -225,24 +256,33 @@ function TrackBar({ route, segments, segKeyPrefix, category, toView, onWheelZoom
   );
 }
 
+interface SegmentDetail {
+  vehicleId: string;
+  category: string;
+  seg: TrackSegment;
+  startPt: TrackDataPoint;
+  endPt: TrackDataPoint;
+}
+
 export default function TrackPlayerPage() {
   const dispatch = useDispatch();
-  const { selectedVehicleIds, isPlaying, speed, currentTs, routes, loaded, dateFrom, dateTo } = useSelector(s => s.trackPlayer);
-  const vehicles = useSelector(s => s.vehicles.items);
+  const { selectedVehicleIds, isPlaying, speed, currentTs, routes, loaded, dateFrom, dateTo } = useSelector((s: RootState) => s.trackPlayer);
+  const vehicles = useSelector((s: RootState) => s.vehicles.items);
 
   // Vehicle-rows drawer: collapsed by default, opens automatically once routes are loaded
   const [drawerOpen, setDrawerOpen] = useState(false);
   useEffect(() => { if (loaded) setDrawerOpen(true); }, [loaded]);
 
   const [vehicleMenuOpen, setVehicleMenuOpen] = useState(false);
+  const [vehicleSearch, setVehicleSearch] = useState('');
   const [datePopoverOpen, setDatePopoverOpen] = useState(false);
-  const [segmentDetail, setSegmentDetail] = useState(null); // { vehicleId, category, seg, startPt, endPt }
+  const [segmentDetail, setSegmentDetail] = useState<SegmentDetail | null>(null);
   useEffect(() => { setSegmentDetail(null); }, [routes]);
 
   // Screen position of the segment card's anchor point (the marker it points at),
   // in pixels relative to the map container — recomputed on every pan/zoom so the
   // card tracks the marker through the fly-to animation and any later map moves.
-  const [cardScreenPos, setCardScreenPos] = useState(null);
+  const [cardScreenPos, setCardScreenPos] = useState<L.Point | null>(null);
   useEffect(() => {
     if (!segmentDetail || !mapInstance.current) { setCardScreenPos(null); return; }
     const map = mapInstance.current;
@@ -254,12 +294,12 @@ export default function TrackPlayerPage() {
     return () => { map.off('move', updatePos); map.off('zoom', updatePos); };
   }, [segmentDetail]);
 
-  const [pendingRange, setPendingRange] = useState([null, null]);
+  const [pendingRange, setPendingRange] = useState<[Date | null, Date | null]>([null, null]);
   const [pendingStartTime, setPendingStartTime] = useState('00:00');
   const [pendingEndTime, setPendingEndTime] = useState(toHHMM(new Date()));
 
   // Zoomed-in view of the timeline: [startFraction, endFraction] of the full loaded range
-  const [zoomRange, setZoomRange] = useState([0, 1]);
+  const [zoomRange, setZoomRange] = useState<[number, number]>([0, 1]);
   useEffect(() => { setZoomRange([0, 1]); }, [routes]);
 
   const mapRef = useRef<HTMLDivElement>(null);
@@ -329,7 +369,7 @@ export default function TrackPlayerPage() {
       const route = routes[vehicleId];
       if (!route || route.length === 0) return;
       const color = colorForIndex(i);
-      const latlngs = route.map(p => [p.lat, p.lng]);
+      const latlngs: [number, number][] = route.map((p): [number, number] => [p.lat, p.lng]);
       allLatlngs.push(...latlngs);
 
       // Full route, dimmed — the played segment (drawn on tick) overlays it in full color
@@ -426,7 +466,7 @@ export default function TrackPlayerPage() {
         const from = { lat: prevPt.lat, lng: prevPt.lng };
         const to = { lat: pt.lat, lng: pt.lng };
 
-        const step = (now) => {
+        const step = (now: number) => {
           const elapsed = now - start;
           const t = Math.min(1, elapsed / duration);
           // easeOutCubic for a natural deceleration into each point
@@ -441,7 +481,7 @@ export default function TrackPlayerPage() {
         animFrameRefs.current[vehicleId] = requestAnimationFrame(step);
       }
 
-      const playedLatlngs = route.slice(0, idx + 1).map(p => [p.lat, p.lng]);
+      const playedLatlngs: [number, number][] = route.slice(0, idx + 1).map((p): [number, number] => [p.lat, p.lng]);
       playedLineRefs.current[vehicleId]?.remove();
       if (playedLatlngs.length > 1) {
         playedLineRefs.current[vehicleId] = L.polyline(playedLatlngs, { color, weight: 4, opacity: 0.9 }).addTo(map);
@@ -462,7 +502,7 @@ export default function TrackPlayerPage() {
     if (!isPlaying) return;
     setSegmentDetail(null);
     if (!mapInstance.current) return;
-    const allLatlngs = Object.values(routes).flatMap(route => route.map(p => [p.lat, p.lng]));
+    const allLatlngs: [number, number][] = Object.values(routes).flatMap(route => route.map((p): [number, number] => [p.lat, p.lng]));
     if (allLatlngs.length > 0) {
       mapInstance.current.fitBounds(L.latLngBounds(allLatlngs), { padding: [40, 40] });
     }
@@ -474,9 +514,9 @@ export default function TrackPlayerPage() {
     if (isPlaying) {
       tickRef.current = setInterval(() => dispatch(tick()), TICK_INTERVAL_MS);
     } else {
-      clearInterval(tickRef.current);
+      if (tickRef.current) clearInterval(tickRef.current);
     }
-    return () => clearInterval(tickRef.current);
+    return () => { if (tickRef.current) clearInterval(tickRef.current); };
   }, [isPlaying, dispatch]);
 
   // Auto-load route data the moment a vehicle is checked in the picker, instead of
@@ -494,14 +534,14 @@ export default function TrackPlayerPage() {
       fromTs = toTs - DEFAULT_RANGE_MS;
       dispatch(setDateRange({ from: new Date(fromTs).toISOString(), to: new Date(toTs).toISOString() }));
     }
-    const additions = {};
+    const additions: Record<string, TrackDataPoint[]> = {};
     missingIds.forEach(id => {
       additions[id] = buildRouteFromTrackData(id, fromTs, toTs);
     });
     dispatch(mergeRoutes(additions));
   }, [selectedVehicleIds]);
 
-  const toggleVehicle = (id) => {
+  const toggleVehicle = (id: string) => {
     if (selectedVehicleIds.includes(id)) {
       dispatch(removeVehicle(id));
     } else {
@@ -510,8 +550,8 @@ export default function TrackPlayerPage() {
     }
   };
 
-  const buildAndLoadRoutes = (fromTs, toTs) => {
-    const generated = {};
+  const buildAndLoadRoutes = (fromTs: number, toTs: number) => {
+    const generated: Record<string, TrackDataPoint[]> = {};
     selectedVehicleIds.forEach(id => {
       generated[id] = buildRouteFromTrackData(id, fromTs, toTs);
     });
@@ -528,7 +568,7 @@ export default function TrackPlayerPage() {
     setDatePopoverOpen(o => !o);
   };
 
-  const applyPreset = (amount, unit) => {
+  const applyPreset = (amount: number, unit: PresetUnit) => {
     const to = new Date();
     const from = new Date(to);
     if (unit === 'today') from.setHours(0, 0, 0, 0); // start of today (12:00 AM) through now
@@ -559,7 +599,7 @@ export default function TrackPlayerPage() {
     dispatch(setDateRange({ from: null, to: null }));
   };
 
-  const centerOnVehicle = (vehicleId) => {
+  const centerOnVehicle = (vehicleId: string) => {
     const marker = vehicleMarkerRefs.current[vehicleId];
     if (marker && mapInstance.current) mapInstance.current.panTo(marker.getLatLng());
   };
@@ -567,7 +607,7 @@ export default function TrackPlayerPage() {
   // Clicking a track-bar segment zooms the map to where it happened, opens a
   // detail card with its time range/duration/locations, and moves the vehicle's
   // playback position (and marker) to the start of that segment.
-  const handleSegmentClick = (vehicleId, seg, category) => {
+  const handleSegmentClick = (vehicleId: string, seg: TrackSegment, category: string) => {
     const route = routes[vehicleId];
     if (!route) return;
     const startPt = route[seg.start];
@@ -586,7 +626,7 @@ export default function TrackPlayerPage() {
     dispatch(setCurrentTs(seg.startTs));
   };
 
-  const scrubToClientX = (clientX) => {
+  const scrubToClientX = (clientX: number) => {
     const track = rangeTrackRef.current;
     if (!track || globalSpan <= 1) return;
     const rect = track.getBoundingClientRect();
@@ -597,10 +637,10 @@ export default function TrackPlayerPage() {
     dispatch(setCurrentTs(Math.round(globalMinTs + frac * globalSpan)));
   };
 
-  const handleScrubStart = (e) => {
+  const handleScrubStart = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!loaded) return;
     scrubToClientX(e.clientX);
-    const onMove = (ev) => scrubToClientX(ev.clientX);
+    const onMove = (ev: MouseEvent) => scrubToClientX(ev.clientX);
     const onUp = () => {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
@@ -611,12 +651,12 @@ export default function TrackPlayerPage() {
 
   // Mouse-wheel zoom on the shared timeline: zooms toward the cursor position so the
   // point under the mouse stays put, like Google Maps / Figma zoom.
-  const handleWheelZoom = (e) => {
+  const handleWheelZoom = (e: React.WheelEvent<HTMLDivElement>) => {
     if (!loaded) return;
     e.preventDefault();
     const rect = e.currentTarget.getBoundingClientRect();
     const cursorRatio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
-    setZoomRange(([zStart, zEnd]) => {
+    setZoomRange(([zStart, zEnd]): [number, number] => {
       const viewSpan = zEnd - zStart;
       const cursorAbsFrac = zStart + cursorRatio * viewSpan;
       const zoomFactor = e.deltaY < 0 ? 0.8 : 1.25; // scroll up = zoom in, scroll down = zoom out
@@ -632,29 +672,38 @@ export default function TrackPlayerPage() {
   const resetZoom = () => setZoomRange([0, 1]);
 
   const vehicleIds = Object.keys(routes);
-  // The shared timeline spans the earliest-to-latest point across ALL loaded
-  // vehicles (not any one vehicle's own point range), since each vehicle's real
-  // trip history can start/end at a different time and have a different point count.
-  let globalMinTs = Infinity, globalMaxTs = -Infinity;
-  vehicleIds.forEach(id => {
-    const r = routes[id];
-    if (r.length === 0) return;
-    if (r[0].ts < globalMinTs) globalMinTs = r[0].ts;
-    if (r[r.length - 1].ts > globalMaxTs) globalMaxTs = r[r.length - 1].ts;
-  });
-  if (!Number.isFinite(globalMinTs)) { globalMinTs = 0; globalMaxTs = 0; }
+  // The shared timeline spans the requested date range (e.g. "now back 2 hours"
+  // from a preset), not just wherever the loaded vehicles' actual data points
+  // happen to fall — a vehicle can have a gap right at the edge of the window,
+  // and the timeline should still show the full requested span (with that edge
+  // reading empty/idle) rather than silently shrinking to the real data extent.
+  let globalMinTs: number, globalMaxTs: number;
+  if (dateFrom && dateTo) {
+    globalMinTs = new Date(dateFrom).getTime();
+    globalMaxTs = new Date(dateTo).getTime();
+  } else {
+    globalMinTs = Infinity;
+    globalMaxTs = -Infinity;
+    vehicleIds.forEach(id => {
+      const r = routes[id];
+      if (r.length === 0) return;
+      if (r[0].ts < globalMinTs) globalMinTs = r[0].ts;
+      if (r[r.length - 1].ts > globalMaxTs) globalMaxTs = r[r.length - 1].ts;
+    });
+    if (!Number.isFinite(globalMinTs)) { globalMinTs = 0; globalMaxTs = 0; }
+  }
   const globalSpan = Math.max(globalMaxTs - globalMinTs, 1);
 
   const [zoomStart, zoomEnd] = zoomRange;
   const isZoomed = zoomStart > 0 || zoomEnd < 1;
   // Maps an absolute fraction (0..1 across the full loaded range) into the zoomed
   // view's local 0..1 space; values outside that range fall outside [0,1].
-  const toView = (frac) => (frac - zoomStart) / Math.max(zoomEnd - zoomStart, 0.0001);
+  const toView = (frac: number): number => (frac - zoomStart) / Math.max(zoomEnd - zoomStart, 0.0001);
 
   const rawProgress = globalSpan > 1 ? (currentTs - globalMinTs) / globalSpan : 0;
   const progress = Math.min(100, Math.max(0, toView(rawProgress) * 100));
 
-  const hourTicks = [];
+  const hourTicks: string[] = [];
   if (loaded && globalSpan > 1) {
     const tickCount = 7;
     for (let i = 0; i < tickCount; i++) {
@@ -680,6 +729,10 @@ export default function TrackPlayerPage() {
           >
             <div className={styles.segmentCardHeader}>
               <div>
+                <div className={styles.segmentCardKind}>
+                  <span className={styles.segmentCardKindDot} style={{ background: segmentDetail.seg.color }} />
+                  {segmentDetail.seg.kind}
+                </div>
                 <div className={styles.segmentCardRange}>{formatRangeHeader(segmentDetail.seg.startTs, segmentDetail.seg.endTs)}</div>
                 <div className={styles.segmentCardDuration}>{formatDurationLong(segmentDetail.seg.endTs - segmentDetail.seg.startTs)}</div>
               </div>
@@ -714,7 +767,11 @@ export default function TrackPlayerPage() {
         {/* Bottom dock: vehicle picker + vehicle rows (collapsible) + transport bar (always visible) */}
         <div className={styles.bottomDock}>
           {/* Vehicle picker — floating button above the drawer, opens a multi-select menu */}
-          <Popover opened={vehicleMenuOpen} onChange={setVehicleMenuOpen} position="top-start" withinPortal shadow="md">
+          <Popover
+            opened={vehicleMenuOpen}
+            onChange={(o) => { setVehicleMenuOpen(o); if (!o) setVehicleSearch(''); }}
+            position="top-start" withinPortal shadow="md"
+          >
             <Popover.Target>
               <Button
                 size="xs" color="blue"
@@ -727,17 +784,46 @@ export default function TrackPlayerPage() {
               </Button>
             </Popover.Target>
             <Popover.Dropdown className={styles.vehicleMenu}>
-              {vehicles.map(v => (
-                <Checkbox
-                  key={v.id}
-                  size="xs"
-                  className={styles.vehicleMenuItem}
-                  label={`${v.name} — ${v.plate}`}
-                  checked={selectedVehicleIds.includes(v.id)}
-                  onChange={() => toggleVehicle(v.id)}
-                />
-              ))}
-              {vehicles.length === 0 && <div className={styles.noEvents}>No vehicles available</div>}
+              <TextInput
+                className={styles.vehicleMenuSearch}
+                placeholder="Search vehicles..."
+                leftSection={<IconSearch size={13} />}
+                value={vehicleSearch}
+                onChange={(e) => setVehicleSearch(e.currentTarget.value)}
+                size="xs"
+              />
+              <div className={styles.vehicleMenuList}>
+                {(() => {
+                  const filteredVehicles = vehicles.filter(v =>
+                    !vehicleSearch ||
+                    v.name.toLowerCase().includes(vehicleSearch.toLowerCase()) ||
+                    v.plate.toLowerCase().includes(vehicleSearch.toLowerCase())
+                  );
+                  if (vehicles.length === 0) return <div className={styles.noEvents}>No vehicles available</div>;
+                  if (filteredVehicles.length === 0) return <div className={styles.noEvents}>No vehicles match "{vehicleSearch}"</div>;
+                  return filteredVehicles.map(v => {
+                    const isSelected = selectedVehicleIds.includes(v.id);
+                    const routeIdx = vehicleIds.indexOf(v.id);
+                    const dotColor = routeIdx >= 0 ? colorForIndex(routeIdx) : 'var(--fv-text-muted)';
+                    return (
+                      <div key={v.id} className={`${styles.vehicleMenuRow} ${isSelected ? styles.vehicleMenuRowSelected : ''}`}>
+                        <Checkbox
+                          size="xs"
+                          className={styles.vehicleMenuItem}
+                          label={
+                            <span className={styles.vehicleMenuLabel}>
+                              <span className={styles.vehicleMenuDot} style={{ background: dotColor }} />
+                              {v.name} — {v.plate}
+                            </span>
+                          }
+                          checked={isSelected}
+                          onChange={() => toggleVehicle(v.id)}
+                        />
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
             </Popover.Dropdown>
           </Popover>
 
@@ -806,15 +892,18 @@ export default function TrackPlayerPage() {
                   <button className={styles.ctrlBtn} disabled={!loaded} onClick={() => { isManualSeekRef.current = true; dispatch(setCurrentTs(globalMaxTs)); }}><IconPlayerSkipForward size={15} /></button>
                 </Tooltip>
 
-                <div className={styles.speedControl}>
-                  <span className={styles.speedValue}>{speed}x</span>
-                  <Slider
-                    className={styles.speedSlider}
-                    min={1} max={100} value={speed} disabled={!loaded}
-                    onChange={(v) => dispatch(setSpeed(v))}
-                    label={null} size="xs"
-                  />
-                </div>
+                <Tooltip label="Playback speed">
+                  <div className={styles.speedControl}>
+                    <span className={styles.speedValue}>{speed}x</span>
+                    <Slider
+                      className={styles.speedSlider}
+                      min={1} max={100} value={speed} disabled={!loaded}
+                      onChange={(v) => dispatch(setSpeed(v))}
+                      label={null} size="xs"
+                    />
+                    <span className={styles.speedMax}>100x</span>
+                  </div>
+                </Tooltip>
 
                 <Popover opened={datePopoverOpen} onChange={setDatePopoverOpen} withinPortal shadow="md" position="top-start">
                   <Popover.Target>

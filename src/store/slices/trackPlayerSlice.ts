@@ -5,9 +5,18 @@ import type { TrackPlayerState, TrackDataPoint } from '@/types';
 // vehicle's route has its own point count/spacing depending on its actual trip
 // history, so an index shared across vehicles wouldn't refer to the same moment
 // in time for each of them. Bars/markers all read against this same clock instead.
-function getGlobalRange(routes: Record<string, TrackDataPoint[]>) {
+//
+// The range is bounded by the requested dateFrom/dateTo (e.g. a "last 2 hours"
+// preset means exactly [now-2h, now]) rather than the actual extent of loaded
+// points — a vehicle's real data can start later or end earlier than the
+// requested window, and playback should still span the full window requested
+// instead of silently shrinking to wherever data happens to exist.
+function getGlobalRange(state: Pick<TrackPlayerState, 'routes' | 'dateFrom' | 'dateTo'>) {
+  if (state.dateFrom && state.dateTo) {
+    return { min: new Date(state.dateFrom).getTime(), max: new Date(state.dateTo).getTime() };
+  }
   let min = Infinity, max = -Infinity;
-  Object.values(routes).forEach(route => {
+  Object.values(state.routes).forEach(route => {
     if (route.length === 0) return;
     if (route[0].ts < min) min = route[0].ts;
     if (route[route.length - 1].ts > max) max = route[route.length - 1].ts;
@@ -45,7 +54,7 @@ const trackPlayerSlice = createSlice({
     loadRoutes(state, action) {
       state.routes = action.payload;
       state.loaded = Object.keys(action.payload).length > 0;
-      state.currentTs = getGlobalRange(state.routes).min;
+      state.currentTs = getGlobalRange(state).min;
       state.isPlaying = false;
     },
     // Adds routes for newly-selected vehicles without discarding routes already
@@ -54,16 +63,16 @@ const trackPlayerSlice = createSlice({
       const wasEmpty = Object.keys(state.routes).length === 0;
       state.routes = { ...state.routes, ...action.payload };
       state.loaded = Object.keys(state.routes).length > 0;
-      if (wasEmpty) state.currentTs = getGlobalRange(state.routes).min;
+      if (wasEmpty) state.currentTs = getGlobalRange(state).min;
     },
     setPlaying(state, action) { state.isPlaying = action.payload; },
     setSpeed(state, action) { state.speed = action.payload; },
     setCurrentTs(state, action) {
-      const { min, max } = getGlobalRange(state.routes);
+      const { min, max } = getGlobalRange(state);
       state.currentTs = Math.min(Math.max(action.payload, min), max);
     },
     tick(state) {
-      const { min, max } = getGlobalRange(state.routes);
+      const { min, max } = getGlobalRange(state);
       if (max <= min || !state.isPlaying) return;
       if (state.currentTs >= max) {
         state.isPlaying = false;
@@ -75,7 +84,7 @@ const trackPlayerSlice = createSlice({
       state.currentTs = Math.min(state.currentTs + stepMs, max);
     },
     reset(state) {
-      state.currentTs = getGlobalRange(state.routes).min;
+      state.currentTs = getGlobalRange(state).min;
       state.isPlaying = false;
     },
   },
