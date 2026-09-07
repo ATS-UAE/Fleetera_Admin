@@ -22,14 +22,21 @@
 .logo {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-  padding: 0 14px;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 10px 0 14px;
   height: var(--fv-topbar-h);
   min-height: var(--fv-topbar-h);
   max-height: var(--fv-topbar-h);
   border-bottom: 1px solid var(--fv-border);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.logoMain {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   overflow: hidden;
 }
 
@@ -271,8 +278,17 @@
   color: var(--fv-text-primary);
 }
 
-.collapseBtn {
-  margin-left: auto;
+.sidebar.collapsed .logo {
+  padding: 0 8px;
+  justify-content: center;
+}
+
+.sidebar.collapsed .logoMain {
+  display: none;
+}
+
+.sidebar.collapsed .collapseBtn {
+  margin-left: 0;
 }
 
 .sidebar.collapsed .navItemWrap {

@@ -1,7 +1,8 @@
 /* ─── DashboardHeader — Unified 56px header bar ─────────────────────── */
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { IconFilter, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { IconFilter, IconChevronDown, IconChevronUp, IconBell } from '@tabler/icons-react';
+import { toggleNotificationsModal } from '@/store/slices/uiSlice';
 import DashboardTabBar from './DashboardTabBar';
 import DashboardToolbar from './DashboardToolbar';
 import styles from './DashboardHeader.module.css';
@@ -12,8 +13,10 @@ interface DashboardHeaderProps {
 }
 
 export default function DashboardHeader({ filterExpanded, onToggleFilter }: DashboardHeaderProps) {
+  const dispatch = useDispatch();
   const dashboards = useSelector((s: any) => s.dashboard.dashboards);
   const activeId = useSelector((s: any) => s.dashboard.activeDashboardId);
+  const notifications = useSelector((s: any) => s.ui.notifications);
   const dashboard = dashboards.find((d: any) => d.id === activeId);
   const filters = dashboard?.filters || {};
 
@@ -32,8 +35,20 @@ export default function DashboardHeader({ filterExpanded, onToggleFilter }: Dash
         <DashboardTabBar />
       </div>
 
-      {/* Right: Actions — Filters button positioned directly to the left of Edit Dashboard */}
+      {/* Right: Actions — bell + Filters button positioned directly to the left of Edit Dashboard */}
       <div className={styles.actionSection}>
+        {/* Notification Bell */}
+        <button
+          className={styles.bellBtn}
+          onClick={() => dispatch(toggleNotificationsModal())}
+          title="Notifications"
+        >
+          <IconBell size={16} />
+          <span className={styles.bellBadge}>{notifications.length || 3}</span>
+        </button>
+
+        <div className={styles.divider} />
+
         <button
           className={`${styles.filterBtn} ${filterExpanded || activeCount > 0 ? styles.filterActive : ''}`}
           onClick={onToggleFilter}

@@ -223,6 +223,7 @@ export interface UiState {
   activeTab: string;
   navOrder: string[];
   notifications: ActivityItem[];
+  notificationsModalOpen: boolean;
   settingsTreeOpen: boolean;
   settingsActiveSection: SettingsSection;
 }

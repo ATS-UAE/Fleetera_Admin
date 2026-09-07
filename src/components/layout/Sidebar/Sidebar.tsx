@@ -120,25 +120,36 @@ export default function Sidebar() {
 
   return (
     <aside className={`${styles.sidebar} ${sidebarCollapsed ? styles.collapsed : ''}`}>
-      {/* Logo — fixed-height header, see Sidebar.module.css */}
+      {/* Logo — header with app title and collapse button */}
       <div className={styles.logo}>
-        <div className={styles.logoIcon}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M3 12L12 3L21 12V21H15V15H9V21H3V12Z" fill="url(#grad)" />
-            <defs>
-              <linearGradient id="grad" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#3b82f6"/>
-                <stop offset="100%" stopColor="#06b6d4"/>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        {!sidebarCollapsed && (
-          <div className={styles.logoText}>
-            <span className={styles.logoName}>FLEETERA-ADMIN</span>
-            {/* <span className={styles.logoTagline}>Enterprise</span> */}
+        <div className={styles.logoMain}>
+          <div className={styles.logoIcon}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M3 12L12 3L21 12V21H15V15H9V21H3V12Z" fill="url(#grad)" />
+              <defs>
+                <linearGradient id="grad" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#3b82f6"/>
+                  <stop offset="100%" stopColor="#06b6d4"/>
+                </linearGradient>
+              </defs>
+            </svg>
           </div>
-        )}
+          {!sidebarCollapsed && (
+            <div className={styles.logoText}>
+              <span className={styles.logoName}>FLEETERA-ADMIN</span>
+              {/* <span className={styles.logoTagline}>Enterprise</span> */}
+            </div>
+          )}
+        </div>
+
+        <Tooltip label={sidebarCollapsed ? 'Expand' : 'Collapse'} position="right" offset={12}>
+          <button
+            className={`${styles.iconBtn} ${styles.collapseBtn}`}
+            onClick={() => dispatch(toggleSidebar())}
+          >
+            {sidebarCollapsed ? <IconChevronRight size={14} /> : <IconChevronLeft size={14} />}
+          </button>
+        </Tooltip>
       </div>
 
       {/* Nav — sortable when reorderMode is on */}
@@ -208,19 +219,6 @@ export default function Sidebar() {
         {/* Settings — pinned to the bottom of the sidebar as an expandable
             tree (Profile / Appearance / Notifications), not a routable page. */}
         <SettingsTree isCollapsed={sidebarCollapsed} />
-
-        <div className={styles.divider} />
-
-        <div className={styles.bottomActions}>
-          <Tooltip label={sidebarCollapsed ? 'Expand' : 'Collapse'} position="right" offset={12}>
-            <button
-              className={`${styles.iconBtn} ${styles.collapseBtn}`}
-              onClick={() => dispatch(toggleSidebar())}
-            >
-              {sidebarCollapsed ? <IconChevronRight size={14} /> : <IconChevronLeft size={14} />}
-            </button>
-          </Tooltip>
-        </div>
       </div>
     </aside>
   );
