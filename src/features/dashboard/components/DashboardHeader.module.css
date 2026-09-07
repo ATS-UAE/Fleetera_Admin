@@ -73,3 +73,45 @@
   background: var(--fv-border);
   margin: 0 2px;
 }
+
+/* Notification Bell */
+.bellBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: var(--fv-bg-card);
+  border: 1px solid var(--fv-border);
+  border-radius: var(--fv-r-md);
+  color: var(--fv-text-secondary);
+  cursor: pointer;
+  transition: all var(--fv-trans-fast);
+  flex-shrink: 0;
+}
+
+.bellBtn:hover {
+  border-color: var(--fv-accent);
+  color: var(--fv-accent);
+  background: var(--fv-accent-subtle);
+}
+
+.bellBadge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--fv-accent);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 2px solid var(--fv-bg-surface);
+}

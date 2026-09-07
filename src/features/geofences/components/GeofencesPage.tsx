@@ -79,6 +79,16 @@ function FormPanel({
     ? drawn.center !== null
     : (drawn.coords?.length ?? 0) >= 3;
 
+  const handleTypeChange = (v: string | null) => {
+    const newType = (v ?? 'circle') as GeofenceType;
+    set('type', newType);
+    if (newType === 'circle') {
+      onDrawCircle();
+    } else {
+      onDrawPolygon();
+    }
+  };
+
   return (
     <div className={styles.formPanel}>
       <div className={styles.formHeader}>
@@ -98,7 +108,7 @@ function FormPanel({
           <Select label="Type" size="xs"
             data={[{ value: 'circle', label: 'Circle' }, { value: 'polygon', label: 'Polygon' }]}
             value={form.type}
-            onChange={v => set('type', (v ?? 'circle') as GeofenceType)} />
+            onChange={handleTypeChange} />
           <ColorInput label="Color" size="xs"
             value={form.color} onChange={v => set('color', v)} />
         </div>
@@ -126,22 +136,10 @@ function FormPanel({
           ))}
         </div>
 
-        {/* Draw buttons */}
+        {/* Map Drawing Status */}
         <div className={styles.drawSection}>
           <div className={styles.drawLabel}>
-            <IconMapPin size={12} /> Draw on map
-          </div>
-          <div className={styles.drawBtns}>
-            <Button size="xs" variant={form.type === 'circle' ? 'filled' : 'light'}
-              color="blue" leftSection={<IconCircle size={13} />}
-              onClick={() => { set('type', 'circle'); onDrawCircle(); }}>
-              Draw Circle
-            </Button>
-            <Button size="xs" variant={form.type === 'polygon' ? 'filled' : 'light'}
-              color="violet" leftSection={<IconPolygon size={13} />}
-              onClick={() => { set('type', 'polygon'); onDrawPolygon(); }}>
-              Draw Polygon
-            </Button>
+            <IconMapPin size={12} /> Interactive Map Drawing
           </div>
           <div className={`${styles.drawStatus} ${hasDrawing ? styles.drawStatusDone : ''}`}>
             {hasDrawing
@@ -583,10 +581,13 @@ export default function GeofencesPage() {
     setEditing(null);
     setForm({ ...EMPTY_FORM });
     setDrawn({ ...EMPTY_DRAWN });
-    setDrawStatus('Click "Draw Circle" or "Draw Polygon" to start');
     clearDraw();
     clearEditLayers();
     setPanelMode('form');
+    // Automatically start drawing mode for the default shape type (circle)
+    setTimeout(() => {
+      startDrawCircle(EMPTY_FORM.color);
+    }, 100);
   };
 
   const openEdit = (g: Geofence) => {

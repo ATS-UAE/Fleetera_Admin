@@ -4,11 +4,11 @@
 :root {
   /* Core Palette — Dark (default) */
   --fv-bg-base:       #0a0e1a;
-  --fv-bg-surface:    #0f1629;
-  --fv-bg-panel:      #141c35;
-  --fv-bg-card:       #1a2540;
-  --fv-bg-hover:      #1f2d4d;
-  --fv-bg-active:     #243358;
+  --fv-bg-surface:    #0a0e1a;
+  --fv-bg-panel:      #10172a;
+  --fv-bg-card:       #151f38;
+  --fv-bg-hover:      #1b2848;
+  --fv-bg-active:     #213258;
 
   --fv-border:        #1e2d4a;
   --fv-border-light:  #253558;

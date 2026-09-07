@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Badge, Tooltip, Avatar } from '@mantine/core';
 import { IconBell, IconSearch, IconRefresh, IconWifi, IconWifiOff } from '@tabler/icons-react';
+import { toggleNotificationsModal } from '@/store/slices/uiSlice';
 import styles from './TopBar.module.css';
 
 const TAB_LABELS = {
@@ -15,9 +16,10 @@ const TAB_LABELS = {
 };
 
 export default function TopBar() {
-  const { activeTab } = useSelector(s => s.ui);
-  const vehicles = useSelector(s => s.vehicles.items);
-  const moving = vehicles.filter(v => v.status === 'moving').length;
+  const dispatch = useDispatch();
+  const { activeTab, notifications } = useSelector((s: any) => s.ui);
+  const vehicles = useSelector((s: any) => s.vehicles.items);
+  const moving = vehicles.filter((v: any) => v.status === 'moving').length;
   const [online] = useState(true);
 
   return (
@@ -57,9 +59,13 @@ export default function TopBar() {
         </Tooltip>
 
         <Tooltip label="Notifications" openDelay={500}>
-          <button className={styles.actionBtn} style={{ position: 'relative' }}>
+          <button
+            className={styles.actionBtn}
+            style={{ position: 'relative' }}
+            onClick={() => dispatch(toggleNotificationsModal())}
+          >
             <IconBell size={16} />
-            <span className={styles.notifBadge}>3</span>
+            <span className={styles.notifBadge}>{notifications.length || 3}</span>
           </button>
         </Tooltip>
 

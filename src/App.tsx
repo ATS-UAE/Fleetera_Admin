@@ -15,6 +15,8 @@ import ChecklistsPage from '@/features/checklists/components/ChecklistsPage';
 import TaskDeskPage from '@/features/taskDesk/components/TaskDeskPage';
 import SharedLinkView from '@/features/locationShare/components/SharedLinkView';
 
+import NotificationModal from '@/components/NotificationModal';
+
 const PAGES: Record<string, any> = {
   dashboard: DashboardPage,
   vehicles: VehiclesPage,
@@ -79,6 +81,7 @@ export default function App() {
       <main style={{ flex: 1, overflow: 'hidden', position: 'relative', minWidth: 0 }}>
         <ActivePage />
       </main>
+      <NotificationModal />
     </div>
   );
 }

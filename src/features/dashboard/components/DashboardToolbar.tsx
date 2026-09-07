@@ -3,7 +3,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   IconPlus, IconArrowBackUp, IconArrowForwardUp,
-  IconDeviceFloppy, IconX, IconEye, IconEdit, IconPalette,
+  IconDeviceFloppy, IconX, IconEdit, IconPalette,
   IconLayoutDashboard,
 } from '@tabler/icons-react';
 import {
